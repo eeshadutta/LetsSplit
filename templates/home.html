@@ -45,11 +45,6 @@
             </div>
         </div> 
     </nav>
-    {%- for category, message in get_flashed_messages(with_categories = true) %}
-        <div class = "alert alert-danger">
-           {{ message }}
-        </div>
-    {%- endfor %}
     <div class="modal fade" id="LogInModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -102,6 +97,11 @@
                                 <input type="date" name="DOB" class="form-control" placeholder="Enter Date Of Birth">
                             </div>
                     </div>
+                    {%- for category, message in get_flashed_messages(with_categories = true) %}
+                        <div class = "alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {%- endfor %}
 
                     <div class="modal-footer">
                         <input type="submit" value="Submit" class="btn btn-primary btn-block">
