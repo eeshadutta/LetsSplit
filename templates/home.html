@@ -29,7 +29,7 @@
 <body>
     <nav class="navbar bg-primary navbar-expand-md navbar-dark">
         <div class="container">
-            <a href="./home.html" class="navbar-brand" id="Home">Let's Split</a>
+            <a href="/" class="navbar-brand" id="Home">Let's Split</a>
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#collapsibleNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -45,6 +45,11 @@
             </div>
         </div> 
     </nav>
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+        <div class = "alert alert-danger">
+           {{ message }}
+        </div>
+    {%- endfor %}
     <div class="modal fade" id="LogInModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -56,12 +61,12 @@
                 </div>
 
                 <div class="modal-body">
-                    <form role="form">
+                    <form role="form" action="{{ request.path }}" method="post">
                         <div class="form-group">
-                            <input type="username" class="form-control" placeholder="Username">
+                            <input type="username" name="username" class="form-control" placeholder="Username">
                         </div>
                         <div class="form-group">
-                            <input type="password" class="form-control" placeholder="Password">
+                            <input type="password" name="password" class="form-control" placeholder="Password">
                         </div>
                     </form>
                 </div>
@@ -83,32 +88,32 @@
                 </div>
 
                 <div class="modal-body">
-                    <form role="form">
+                    <form action="{{ request.path }}" method="post">
                         <div class="form-group">
-                            <input type="email" class="form-control" placeholder="Enter Email Address">
+                            <input type="email" name="email" class="form-control" placeholder="Enter Email Address">
                         </div>
                         <div class="form-group">
-                            <input type="username" class="form-control" placeholder="Enter Username">
+                            <input type="username" name="username" class="form-control" placeholder="Enter Username">
                         </div>
                         <div class="form-group">
-                            <input type="password" class="form-control" placeholder="Enter Password">
+                            <input type="password" name="password" class="form-control" placeholder="Enter Password">
                         </div>
                         <div class="form-group">
-                            <input type="date" class="form-control" placeholder="Enter Date Of Birth">
+                            <input type="date" name="DOB" class="form-control" placeholder="Enter Date Of Birth">
                         </div>
-                    </form>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                    <input type="submit" value="Submit" class="btn btn-primary btn-block">
                 </div>
+            </form>
             </div>
         </div>
     </div>
     <div class="container">
         <div class="row">
             <div class="Logo col-xs-5 col-sm-5 col-md-5 col-lg-5">
-                <img src="./logo.png" alt="logo" width="550vw" class="img-fluid">
+                <img src="{{url_for('static', filename='logo.png')}}" alt="logo" width="550vw" class="img-fluid">
             </div>
 
             <div class="description col-xs-7 col-sm-7 col-md-7 col-lg-7">
