@@ -21,7 +21,21 @@
         }
         .description {
             position: relative;
-            top: 10vw;
+            top: 6vw;
+        }
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            line-height: 60px;
+        }
+        .copyright {
+            position: relative;
+        }
+        .contact {
+            position: relative;
+            left: 23vw;
         }
     </style>
 
@@ -57,16 +71,26 @@
                 <form role="form" action="{{ request.path }}" method="post">
                     <div class="modal-body">
                             <div class="form-group">
-                                <input type="username" name="username" class="form-control" placeholder="Username">
+                                <input type="username" name="username" class="form-control" placeholder="Username" required>
                             </div>
                             <div class="form-group">
-                                <input type="password" name="password" class="form-control" placeholder="Password">
+                                <input type="password" name="password" class="form-control" placeholder="Password" required>
                             </div>
+                            
+                            {% if message %}
+                            <div class = "alert alert-danger">
+                                {{ message }}
+                                <script>
+                                    $('#LogInModal').modal('show')
+                                </script>
+                            </div>
+                            {% endif %}
                         
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        <button type="submit" name="SignIn" class="btn btn-primary btn-block">Sign In</button>
+                        
                     </div>
                 </form>
             </div>
@@ -85,26 +109,29 @@
                 <form action="{{ request.path }}" method="post">
                     <div class="modal-body">
                             <div class="form-group">
-                                <input type="email" name="email" class="form-control" placeholder="Enter Email Address">
+                                <input type="email" name="email" class="form-control" placeholder="Enter Email Address" required>
                             </div>
                             <div class="form-group">
-                                <input type="username" name="username" class="form-control" placeholder="Enter Username">
+                                <input type="username" name="username" class="form-control" placeholder="Enter Username" required>
                             </div>
                             <div class="form-group">
-                                <input type="password" name="password" class="form-control" placeholder="Enter Password">
+                                <input type="password" name="password" class="form-control" placeholder="Enter Password" required>
                             </div>
                             <div class="form-group">
-                                <input type="date" name="DOB" class="form-control" placeholder="Enter Date Of Birth">
+                                <input type="date" name="DOB" class="form-control" placeholder="Enter Date Of Birth" required>
                             </div>
                     </div>
-                    {%- for category, message in get_flashed_messages(with_categories = true) %}
-                        <div class = "alert alert-danger">
-                            {{ message }}
-                        </div>
-                    {%- endfor %}
+                    {% if message %}
+                    <div class = "alert alert-danger">
+                        {{ message }}
+                        <script>
+                            $('#SignUpModal').modal('show')
+                        </script>
+                    </div>
+                    {% endif %}
 
                     <div class="modal-footer">
-                        <input type="submit" value="Submit" class="btn btn-primary btn-block">
+                        <input type="submit" value="Submit" name="SignUp" class="btn btn-primary btn-block">
                     </div>
                 </form>
             </div>
@@ -127,6 +154,14 @@
             </div>
         </div>
     </div>
+        <footer class="footer  bg-primary">
+            <div class="copyright container row">
+                <div class="offset-xs-2 offset-sm-2 offset-md-2 offset-lg-2 col-xs-6 col-sm-6 col-md-6 col-lg-6" style="color: white">
+                    <p>&copy; Copyright 2018 Let's Split.All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
     <script>
             var dateControl = document.querySelector('input[type="date"]');       
             dateControl.value = '2000-01-01';
