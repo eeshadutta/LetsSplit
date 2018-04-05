@@ -6,58 +6,60 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.sqlite3'
 app.config['SECRET_KEY'] = "random string"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-db = SQLAlchemy(app)
+DB = SQLAlchemy(app)
 
-class users(db.Model):
-    id = db.Column('user_id', db.Integer, primary_key = True)
-    email = db.Column(db.String(100))
-    username = db.Column(db.String(50))
-    password = db.Column(db.String(200)) 
-    DOB = db.Column(db.String(10))
+class users(DB.Model):
+    id = DB.Column('user_id', DB.Integer, primary_key = True)
+    email = DB.Column(DB.String(100))
+    username = DB.Column(DB.String(50))
+    password = DB.Column(DB.String(200))
+    DOB = DB.Column(DB.String(10))
 
-def __init__(self, email, username, password, DOB):
-   self.email = email
-   self.username = username
-   self.password = password
-   self.DOB = DOB
+    def __init__(self, email, username, password, DOB):
+        self.email = email
+        self.username = username
+        self.password = password
+        self.DOB = DOB
 
 @app.route('/', methods = ['GET', 'POST'])
 def sign_up(message=None):
     if request.method == 'POST':
         if 'SignUp' in request.form:
             print(request.form)
-            if not request.form['email'] or not request.form['username'] or not request.form['password'] or not request.form['DOB']:
+            if not request.form['email'] or not request.form['username'] or not request.form['password'] or not request.form['DOB'] or not request.form['passwordconfirm']:
                 flash('Please enter all the fields', 'error')
             else:
                 x = users.query.filter_by(username=request.form['username']).first()
-                print(x)
+                #print(x)
+                if request.form['password'] != request.form['passwordconfirm']:
+                    message = 'Passwords Don\'t Match'
                 if x is None:
                     user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'])
-                    db.session.add(user)
-                    db.session.commit()
+                    DB.session.add(user)
+                    DB.session.commit()
                     #print("HAHA")
                 else:
                     message = 'Username already taken'
 
         elif 'SignIn' in request.form:
-            print(request.form)
+            #print(request.form)
             if request.form['username'] is '':
                 message = "Please Enter Username"
             elif not request.form['password']:
                 message = "Please Enter Password"
-            else : 
+            else :
                 x = users.query.filter_by(username=request.form['username']).first()
                 if x is None:
                     message = "Incorrect Username"
                 elif request.form['password'] is None:
-                    message = 'Please Enter Password'            
+                    message = 'Please Enter Password'
                 elif str(x.password) == str(request.form['password']) and x is not None:
                     print("Yay! Logged In")
                 elif str(x.password) != str(request.form['password']):
                     message = "Incorrect Password"
-                
+
     return render_template('home.html', message=message)
 
 if __name__ == '__main__':
-    db.create_all()
+    DB.create_all()
     app.run(debug=True)
