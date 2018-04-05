@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -25,24 +25,20 @@ class users(DB.Model):
 def sign_up(message=None):
     if request.method == 'POST':
         if 'SignUp' in request.form:
-            print(request.form)
             if not request.form['email'] or not request.form['username'] or not request.form['password'] or not request.form['DOB'] or not request.form['passwordconfirm']:
                 flash('Please enter all the fields', 'error')
             else:
                 x = users.query.filter_by(username=request.form['username']).first()
-                #print(x)
                 if request.form['password'] != request.form['passwordconfirm']:
                     message = 'Passwords Don\'t Match'
                 if x is None:
                     user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'])
                     DB.session.add(user)
                     DB.session.commit()
-                    #print("HAHA")
                 else:
                     message = 'Username already taken'
 
         elif 'SignIn' in request.form:
-            #print(request.form)
             if request.form['username'] is '':
                 message = "Please Enter Username"
             elif not request.form['password']:
@@ -54,12 +50,21 @@ def sign_up(message=None):
                 elif request.form['password'] is None:
                     message = 'Please Enter Password'
                 elif str(x.password) == str(request.form['password']) and x is not None:
-                    print("Yay! Logged In")
+                    return redirect(url_for('profile_page', username=request.form['username']))
                 elif str(x.password) != str(request.form['password']):
                     message = "Incorrect Password"
 
     return render_template('home.html', message=message)
 
+
+@app.route('/<username>', methods=['GET', 'POST'])
+def profile_page(username):
+    if request.method == 'POST':
+        if 'logout' in request.form:
+            return redirect(url_for('sign_up'))
+            
+    return render_template('profile_page.html', username=username)
+    
 if __name__ == '__main__':
     DB.create_all()
     app.run(debug=True)
