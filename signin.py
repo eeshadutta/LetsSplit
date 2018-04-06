@@ -22,7 +22,6 @@ class users(DB.Model):
     password = DB.Column(DB.String(200))
     DOB = DB.Column(DB.String(10))
     profile_pic = DB.Column(DB.String(100))
-    #profilepicurl = DB.Column(DB.String(100))
 
     def __init__(self, email, username, password, DOB ,profile_pic_url):
         self.email = email
@@ -30,11 +29,6 @@ class users(DB.Model):
         self.password = password
         self.DOB = DOB
         self.profile_pic = profile_pic_url
-
-
-#class SearchForm(Form):
-#  search = StringField('search', [DataRequired()])
-#  submit = SubmitField('Search', render_kw={'class': 'btn btn-success btn-block'})
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -50,7 +44,6 @@ def sign_up(message=None):
                 if x is None:
                     img = request.files['profile_pic']
                     img.save(secure_filename(img.filename))
-                    #print(secure_filename(img.filename))
                     os.system("mv " + img.filename + " ./profile_pics/")
                     user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url="./profile_pics/" + img.filename)
                     DB.session.add(user)
