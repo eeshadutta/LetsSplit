@@ -31,7 +31,7 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
                             <div class="form-group">
-                                <input type="text" name="search_username" class="form-control form-control-lg" placeholder="Search.....">
+                                <input type="text" name="username" class="form-control form-control-lg" placeholder="Search.....">
                             </div>
                         </li>
                         <li class="nav-item">
@@ -53,5 +53,19 @@
             </div>
         </div>
     </nav>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+        {% for user in results %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
 </body>
 </html>

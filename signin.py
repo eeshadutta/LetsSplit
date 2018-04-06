@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
+from wtforms import StringField
+from wtforms.validators import DataRequired
 import os
 
 app = Flask(__name__)
@@ -13,6 +15,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 DB = SQLAlchemy(app)
 
 class users(DB.Model):
+    __searchable__ = ['username']
     id = DB.Column('user_id', DB.Integer, primary_key = True)
     email = DB.Column(DB.String(100))
     username = DB.Column(DB.String(50))
@@ -27,6 +30,12 @@ class users(DB.Model):
         self.password = password
         self.DOB = DOB
         self.profile_pic = profile_pic_url
+
+
+#class SearchForm(Form):
+#  search = StringField('search', [DataRequired()])
+#  submit = SubmitField('Search', render_kw={'class': 'btn btn-success btn-block'})
+
 
 @app.route('/', methods = ['GET', 'POST'])
 def sign_up(message=None):
@@ -68,9 +77,23 @@ def sign_up(message=None):
     return render_template('home.html', message=message)
 
 
+@app.route('/<username>/search_results/<query>')
+def search_results(username, query):
+    results = users.query.filter_by(username=query).all()
+    if request.method == 'POST':
+        if 'search' in request.form:
+            return redirect(url_for('search_results', username=username, query=request.form['search_username']))
+        if 'logout' in request.form:
+            return redirect(url_for('sign_up'))
+
+    return render_template('search_results.html', username=username, results=results)
+
+
 @app.route('/<username>', methods=['GET', 'POST'])
 def profile_page(username):
     if request.method == 'POST':
+        if 'search' in request.form:
+            return redirect(url_for('search_results', username=username, query=request.form['search_username']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
 
