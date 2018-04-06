@@ -44,6 +44,7 @@ def sign_up(message=None):
                 if x is None:
                     img = request.files['profile_pic']
                     img.save(secure_filename(img.filename))
+                    os.makedirs("./profile_pics", exist_ok=True)
                     os.system("mv " + img.filename + " ./profile_pics/")
                     user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url="./profile_pics/" + img.filename)
                     DB.session.add(user)
