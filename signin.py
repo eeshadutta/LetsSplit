@@ -22,13 +22,15 @@ class users(DB.Model):
     password = DB.Column(DB.String(200))
     DOB = DB.Column(DB.String(10))
     profile_pic = DB.Column(DB.String(100))
+    name = DB.Column(DB.String(100))
 
-    def __init__(self, email, username, password, DOB ,profile_pic_url):
+    def __init__(self, email, username, password, DOB ,profile_pic_url, name):
         self.email = email
         self.username = username
         self.password = password
         self.DOB = DOB
         self.profile_pic = profile_pic_url
+        self.name = name
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -45,10 +47,11 @@ def sign_up(message=None):
                     img = request.files['profile_pic']
                     img.save(secure_filename(img.filename))
                     os.makedirs("./profile_pics", exist_ok=True)
-                    os.system("mv " + img.filename + " ./profile_pics/")
-                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url="./profile_pics/" + img.filename)
+                    os.system("mv " + secure_filename(img.filename) + " ./profile_pics/")
+                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url="./profile_pics/" + img.filename, name = request.form['name'])
                     DB.session.add(user)
                     DB.session.commit()
+                    return redirect(url_for('profile_page', username=request.form['username']))
                 else:
                     message = 'Username already taken'
 
@@ -73,7 +76,7 @@ def sign_up(message=None):
 
 @app.route('/<username>/search/<query>')
 def search_results(username, query):
-    results = users.query.filter_by(username=query).all()
+    results = users.query.filter(users.username.startswith(query)).all()
     if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('search_results', username=username, query=request.form['search_username']))
