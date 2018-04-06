@@ -71,7 +71,7 @@ def sign_up(message=None):
     return render_template('home.html', message=message)
 
 
-@app.route('/<username>/search_results/<query>')
+@app.route('/<username>/search/<query>')
 def search_results(username, query):
     results = users.query.filter_by(username=query).all()
     if request.method == 'POST':
