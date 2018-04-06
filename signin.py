@@ -15,7 +15,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 DB = SQLAlchemy(app)
 
 class users(DB.Model):
-    __searchable__ = ['username']
+    __searchable__ = ['name']
     id = DB.Column('user_id', DB.Integer, primary_key = True)
     email = DB.Column(DB.String(100))
     username = DB.Column(DB.String(50))
@@ -75,22 +75,24 @@ def sign_up(message=None):
 
 
 @app.route('/<username>/search/<query>')
-def search_results(username, query):
+def search_results(username, query, message=None):
     results = users.query.filter(users.username.startswith(query)).all()
+    if not results:
+        message = "Oops... No results found"
     if request.method == 'POST':
         if 'search' in request.form:
-            return redirect(url_for('search_results', username=username, query=request.form['search_username']))
+            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
 
-    return render_template('search_results.html', username=username, results=results)
+    return render_template('search_results.html', username=username, results=results, message=message)
 
 
 @app.route('/<username>', methods=['GET', 'POST'])
 def profile_page(username):
     if request.method == 'POST':
         if 'search' in request.form:
-            return redirect(url_for('search_results', username=username, query=request.form['search_username']))
+            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
 
