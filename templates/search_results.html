@@ -56,22 +56,16 @@
     {% if message %}
       {{ message }}
     {% else %}
-    <div class="table-responsive">
-      <table class="table table-bordered">
-        <tr>
-          <th>Name</th>
-          <th>Username</th>
-          <th>Email</th>
-        </tr>
         {% for user in results %}
-        <tr>
-          <td>{{ user.name }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-        </tr>
+            <div class="card">
+                <img class="card-img-top" src="{{ user.profile_pic }}" alt="Card Image">
+                <div class="card-body">
+                    <h3 class="card-title">Name: {{ user.name }}</h3>
+                    <h5 class="card-title">Username: {{ user.username }}</h5>
+                    <h5 class="card-text">Email: {{ user.email }}</h5>
+                </div>
+            </div>
         {% endfor %}
-      </table>
-    </div>
     {% endif %}
 </body>
 </html>
