@@ -56,15 +56,23 @@
     {% if message %}
       {{ message }}
     {% else %}
+        {% set count = 1 %}
         {% for user in results %}
-            <div class="row card" style="width:50%">
-                <img class="card-img-top" src="../../static/{{ user.profile_pic }}" alt="Card Image" height="100vw" width="100vw">
-                <div class="card-body">
-                    <h3 class="card-title">Name: {{ user.name }}</h3>
-                    <h5 class="card-title">Username: {{ user.username }}</h5>
-                    <h5 class="card-text">Email: {{ user.email }}</h5>
+            {% if count%2==1 %}
+                <div class="row">
+            {% endif %}
+                    <div class="card col=md-6" style="width:50%">
+                        <img class="card-img-top" src="../../static/{{ user.profile_pic }}" alt="Card Image">
+                        <div class="card-body">
+                            <h3 class="card-title">Name: {{ user.name }}</h3>
+                            <h5 class="card-title">Username: {{ user.username }}</h5>
+                            <h5 class="card-text">Email: {{ user.email }}</h5>
+                        </div>
+                    </div>
+            {% if count%2==0 %}
                 </div>
-            </div>
+            {% endif %}
+            {% set count=count+1 %}
         {% endfor %}
     {% endif %}
 </body>
