@@ -1,25 +1,37 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug import secure_filename
+from wtforms import StringField
+from wtforms.validators import DataRequired
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.sqlite3'
 app.config['SECRET_KEY'] = "random string"
+app.config['UPLOAD_FOLDER'] = "./profile_pics"
+
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 DB = SQLAlchemy(app)
 
 class users(DB.Model):
+    __searchable__ = ['name']
     id = DB.Column('user_id', DB.Integer, primary_key = True)
     email = DB.Column(DB.String(100))
     username = DB.Column(DB.String(50))
     password = DB.Column(DB.String(200))
     DOB = DB.Column(DB.String(10))
+    profile_pic = DB.Column(DB.String(100))
+    name = DB.Column(DB.String(100))
 
-    def __init__(self, email, username, password, DOB):
+    def __init__(self, email, username, password, DOB ,profile_pic_url, name):
         self.email = email
         self.username = username
         self.password = password
         self.DOB = DOB
+        self.profile_pic = profile_pic_url
+        self.name = name
+
 
 @app.route('/', methods = ['GET', 'POST'])
 def sign_up(message=None):
@@ -32,9 +44,14 @@ def sign_up(message=None):
                 if request.form['password'] != request.form['passwordconfirm']:
                     message = 'Passwords Don\'t Match'
                 if x is None:
-                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'])
+                    img = request.files['profile_pic']
+                    img.save(secure_filename(img.filename))
+                    os.makedirs("./profile_pics", exist_ok=True)
+                    os.system("mv " + secure_filename(img.filename) + " ./profile_pics/")
+                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url="./profile_pics/" + img.filename, name = request.form['name'])
                     DB.session.add(user)
                     DB.session.commit()
+                    return redirect(url_for('profile_page', username=request.form['username']))
                 else:
                     message = 'Username already taken'
 
@@ -57,14 +74,30 @@ def sign_up(message=None):
     return render_template('home.html', message=message)
 
 
+@app.route('/<username>/search/<query>', methods=['GET', 'POST'])
+def search_results(username, query, message=None):
+    results = users.query.filter(users.username.startswith(query)).all()
+    if not results:
+        message = "Oops... No results found"
+    if request.method == 'POST':
+        if 'search' in request.form:
+            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
+        if 'logout' in request.form:
+            return redirect(url_for('sign_up'))
+
+    return render_template('search_results.html', username=username, results=results, message=message)
+
+
 @app.route('/<username>', methods=['GET', 'POST'])
 def profile_page(username):
     if request.method == 'POST':
+        if 'search' in request.form:
+            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
-            
+
     return render_template('profile_page.html', username=username)
-    
+
 if __name__ == '__main__':
     DB.create_all()
     app.run(debug=True)

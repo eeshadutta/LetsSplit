@@ -53,5 +53,25 @@
             </div>
         </div>
     </nav>
+    {% if message %}
+      {{ message }}
+    {% else %}
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Email</th>
+        </tr>
+        {% for user in results %}
+        <tr>
+          <td>{{ user.name }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
 </body>
 </html>
