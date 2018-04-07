@@ -18,7 +18,7 @@
         }
     </style>
 </head>
-<body>
+<body style="background-color:dodgerblue">
     <!--<h1>Hi {{ username }}</h1>-->
     <nav class="navbar bg-primary navbar-expand-md navbar-dark">
         <div class="container">
@@ -53,27 +53,30 @@
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="container" style="top:5vw;">
+        {% set count = [1] %}
         {% if message %}
         {{ message }}
         {% else %}
-            {% set count = 1 %}
             {% for user in results %}
-                {% if count%2==1 %}
+                {% if count[0]%2==1 %}
                     <div class="row">
                 {% endif %}
-                        <div class="card col=md-6" style="width:50%">
-                            <img class="card-img-top" src="../../static/{{ user.profile_pic }}" alt="Card Image">
+                        <div class="card col-md-5 bg-primary text-white" style="margin-top:1vw;" >
+                            <img class="card-img-top img-thumbnail" src="../../static/{{ user.profile_pic }}" alt="Card Image" style="position:relative; top:2%;">
                             <div class="card-body">
-                                <h3 class="card-title">Name: {{ user.name }}</h3>
-                                <h5 class="card-title">Username: {{ user.username }}</h5>
-                                <h5 class="card-text">Email: {{ user.email }}</h5>
+                                <h4 class="card-title card-header">Name: {{ user.name }}</h4>
+                                <div class="card-text card-body  ">Username: {{ user.username }}</div>
+                                <div class="card-text card-footer">Email: {{ user.email }}</div>
                             </div>
                         </div>
-                {% if count%2==0 %}
+                {% if count[0]%2==0 %}
                     </div>
+                {%else%}
+                    <div class="offset-md-2"></div>
                 {% endif %}
-                {% set count=count+1 %}
+                {% if count.append(count.pop() + 1) %}
+                {% endif %} 
             {% endfor %}
         {% endif %}
     </div>
