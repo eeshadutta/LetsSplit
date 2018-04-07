@@ -57,8 +57,8 @@
       {{ message }}
     {% else %}
         {% for user in results %}
-            <div class="card">
-                <img class="card-img-top" src="{{ user.profile_pic }}" alt="Card Image">
+            <div class="row card" style="width:50%">
+                <img class="card-img-top" src="../../static/{{ user.profile_pic }}" alt="Card Image" height="100vw" width="100vw">
                 <div class="card-body">
                     <h3 class="card-title">Name: {{ user.name }}</h3>
                     <h5 class="card-title">Username: {{ user.username }}</h5>

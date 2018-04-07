@@ -46,9 +46,9 @@ def sign_up(message=None):
                 if x is None:
                     img = request.files['profile_pic']
                     img.save(secure_filename(img.filename))
-                    os.makedirs("./profile_pics", exist_ok=True)
-                    os.system("mv " + secure_filename(img.filename) + " ./profile_pics/")
-                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url="./profile_pics/" + img.filename, name = request.form['name'])
+                    #os.makedirs("./static/profile_pics", exist_ok=True)
+                    os.system("mv " + secure_filename(img.filename) + " ./static/")
+                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url= img.filename, name = request.form['name'])
                     DB.session.add(user)
                     DB.session.commit()
                     return redirect(url_for('profile_page', username=request.form['username']))
@@ -76,7 +76,10 @@ def sign_up(message=None):
 
 @app.route('/<username>/search/<query>', methods=['GET', 'POST'])
 def search_results(username, query, message=None):
+    url_dict = {}
     results = users.query.filter(users.username.startswith(query)).all()
+    for x in results:
+        url_dict[x.username] = x.profile_pic
     if not results:
         message = "Oops... No results found"
     if request.method == 'POST':
@@ -85,7 +88,7 @@ def search_results(username, query, message=None):
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
 
-    return render_template('search_results.html', username=username, results=results, message=message)
+    return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict)
 
 
 @app.route('/<username>', methods=['GET', 'POST'])
