@@ -23,14 +23,16 @@ class users(DB.Model):
     DOB = DB.Column(DB.String(10))
     profile_pic = DB.Column(DB.String(100))
     name = DB.Column(DB.String(100))
+    bio = DB.Column(DB.String(200))
 
-    def __init__(self, email, username, password, DOB ,profile_pic_url, name):
+    def __init__(self, email, username, password, DOB ,profile_pic_url, name, bio):
         self.email = email
         self.username = username
         self.password = password
         self.DOB = DOB
         self.profile_pic = profile_pic_url
         self.name = name
+        self.bio = bio
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -48,7 +50,7 @@ def sign_up(message=None):
                     img.save(secure_filename(img.filename))
                     #os.makedirs("./profile_pics", exist_ok=True)
                     os.system("mv " + secure_filename(img.filename) + " ./static/")
-                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url = secure_filename(img.filename), name = request.form['name'])
+                    user = users(email = request.form['email'], username = request.form['username'], password = request.form['password'], DOB = request.form['DOB'], profile_pic_url = secure_filename(img.filename), name = request.form['name'], bio = request.form['bio'])
                     DB.session.add(user)
                     DB.session.commit()
                     return redirect(url_for('profile_page', username=request.form['username']))
@@ -93,13 +95,18 @@ def search_results(username, query, message=None):
 
 @app.route('/<username>', methods=['GET', 'POST'])
 def profile_page(username):
+    print(username)
+    user = users.query.filter_by(username=username).first()
+    #print(user.profile_pic)
     if request.method == 'POST':
+
         if 'search' in request.form:
             return redirect(url_for('search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
+        
 
-    return render_template('profile_page.html', username=username)
+    return render_template('profile_page.html', username=username, user=user)
 
 if __name__ == '__main__':
     DB.create_all()
