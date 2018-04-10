@@ -54,30 +54,39 @@
             {{ message }}
             {% else %}
                 {% for user in results %}
-                    {% if count[0]%2==1 %}
-                        <div class="row">
-                    {% endif %}
-                            <div class="card col-md-5 bg-primary text-white" style="margin-top:1vw;" >
-                                <img class="card-img-top img-thumbnail" src="../../static/{{ user.profile_pic }}" alt="Card Image" style="position:relative; top:2%;">
-                                <div class="card-body">
-                                    <h4 class="card-title card-header">Name: {{ user.name }}</h4>
-                                    <div class="card-text card-body  ">Username: {{ user.username }}</div>
-                                    <div class="card-text card-footer">Email: {{ user.email }}</div>
-                                    <form action="{{ request.path }}" method="post">
-                                        <input type="text" name="friend_to _be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
-                                        <button type="submit" name="add_friend" class="btn btn-primary btn-lg btn-block">
-                                            Add Friend
-                                        </button>
-                                    </form>
+                    {% if user.username != username %}
+                        {% if count[0]%2==1 %}
+                            <div class="row">
+                        {% endif %}
+                                <div class="card col-md-5 bg-primary text-white" style="margin-top:1vw;" >
+                                    <img class="card-img-top img-thumbnail" src="../../static/{{ user.profile_pic }}" alt="Card Image" style="position:relative; top:2%;">
+                                    <div class="card-body">
+                                        <h4 class="card-title card-header">Name: {{ user.name }}</h4>
+                                        <div class="card-text card-body  ">Username: {{ user.username }}</div>
+                                        <div class="card-text card-footer">Email: {{ user.email }}</div>
+                                        {% if user.username not in friend_list %}
+                                            <form action="{{ request.path }}" method="post">
+                                                <input type="text" name="friend_to_be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
+                                                <button type="submit" name="add_friend" class="btn btn-primary btn-lg btn-block">
+                                                    Add Friend
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <div class="card-text card-footer text-center">
+                                                Friends
+                                                <span class="bg-primary"><i class="fa fa-check"></i></span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
+                        {% if count[0]%2==0 %}
                             </div>
-                    {% if count[0]%2==0 %}
-                        </div>
-                    {%else%}
-                        <div class="offset-md-2"></div>
+                        {%else%}
+                            <div class="offset-md-2"></div>
+                        {% endif %}
+                        {% if count.append(count.pop() + 1) %}
+                        {% endif %} 
                     {% endif %}
-                    {% if count.append(count.pop() + 1) %}
-                    {% endif %} 
                 {% endfor %}
             {% endif %}
         </div>
