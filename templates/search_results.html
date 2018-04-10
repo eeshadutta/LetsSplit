@@ -63,6 +63,12 @@
                                     <h4 class="card-title card-header">Name: {{ user.name }}</h4>
                                     <div class="card-text card-body  ">Username: {{ user.username }}</div>
                                     <div class="card-text card-footer">Email: {{ user.email }}</div>
+                                    <form action="{{ request.path }}" method="post">
+                                        <input type="text" name="friend_to _be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
+                                        <button type="submit" name="add_friend" class="btn btn-primary btn-lg btn-block">
+                                            Add Friend
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                     {% if count[0]%2==0 %}
