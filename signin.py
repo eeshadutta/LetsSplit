@@ -99,7 +99,7 @@ def sign_up(message=None):
 
 
 @app.route('/<username>', methods=['GET', 'POST'])
-def profile_page(username):
+def profile_page(username, message=None):
     user = users.query.filter_by(username=username).first()
     if request.method == 'POST':
         if 'search' in request.form:
@@ -107,11 +107,30 @@ def profile_page(username):
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
         if 'add_transaction' in request.form:
-            transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
-            DB.session.add(transaction)
-            DB.session.commit()
+            if request.form['from_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['from_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['to_user'] not in friend_list:
+                    message = request.form['to_user'] + " is not a friend"
+                else:
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            elif request.form['to_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['to_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['from_user'] not in friend_list:
+                    message = request.form['from_user'] + " is not a friend"
+                else:
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            else:
+                message = "You can only add your own transactions"
         
-    return render_template('profile_page.html', username=username, user=user)
+    return render_template('profile_page.html', username=username, user=user, message=message)
 
 
 @app.route('/<username>/search/<query>', methods=['GET', 'POST'])
