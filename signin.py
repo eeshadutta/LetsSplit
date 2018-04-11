@@ -106,6 +106,10 @@ def profile_page(username):
             return redirect(url_for('search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
+        if 'add_transaction' in request.form:
+            transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+            DB.session.add(transaction)
+            DB.session.commit()
         
     return render_template('profile_page.html', username=username, user=user)
 
@@ -138,6 +142,7 @@ def search_results(username, query, message=None):
             fr2.friend = a + username + ','
             friend_list = fr1.friend.split(',')
             DB.session.commit()
+
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
 
 
