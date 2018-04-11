@@ -44,6 +44,18 @@ class friends(DB.Model):
         self.friend = ''
         
 
+class transactions(DB.Model):
+    id = DB.Column('user_id', DB.Integer, primary_key=True)
+    from_user = DB.Column(DB.String(50))
+    to_user = DB.Column(DB.String(50))
+    amount = DB.Column(DB.String(10))
+
+    def __init__(self, from_user, to_user, amount):
+        self.from_user = from_user
+        self.to_user = to_user
+        self.amount = amount
+
+
 @app.route('/', methods = ['GET', 'POST'])
 def sign_up(message=None):
     if request.method == 'POST':
@@ -86,6 +98,18 @@ def sign_up(message=None):
     return render_template('home.html', message=message)
 
 
+@app.route('/<username>', methods=['GET', 'POST'])
+def profile_page(username):
+    user = users.query.filter_by(username=username).first()
+    if request.method == 'POST':
+        if 'search' in request.form:
+            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
+        if 'logout' in request.form:
+            return redirect(url_for('sign_up'))
+        
+    return render_template('profile_page.html', username=username, user=user)
+
+
 @app.route('/<username>/search/<query>', methods=['GET', 'POST'])
 def search_results(username, query, message=None):
     url_dict = {}
@@ -114,24 +138,8 @@ def search_results(username, query, message=None):
             fr2.friend = a + username + ','
             friend_list = fr1.friend.split(',')
             DB.session.commit()
-
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
 
-
-@app.route('/<username>', methods=['GET', 'POST'])
-def profile_page(username):
-    print(username)
-    user = users.query.filter_by(username=username).first()
-    #print(user.profile_pic)
-    if request.method == 'POST':
-
-        if 'search' in request.form:
-            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
-        if 'logout' in request.form:
-            return redirect(url_for('sign_up'))
-        
-
-    return render_template('profile_page.html', username=username, user=user)
 
 if __name__ == '__main__':
     DB.create_all()
