@@ -37,6 +37,11 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
                             <div class="form-group">
+                                <button type="submit" name="log" class="btn btn-primary btn-lg">History</button>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <div class="form-group">
                                 <input type="text" name="search_name" class="form-control form-control-lg" placeholder="Search.....">
                             </div>
                         </li>
@@ -104,9 +109,7 @@
                     {% if user.username not in friend_list %}
                     <form action="{{ request.path }}" method="post">
                         <input type="text" name="friend_to_be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
-                        <button type="submit" name="add_friend" class="btn btn-primary btn-lg btn-block">
-                                                    Add Friend
-                                                </button>
+                        <button type="submit" name="add_friend" class="btn btn-primary btn-lg btn-block">Add Friend</button>
                     </form>
                     {% else %}
                     <div class="card-text card-footer text-center">

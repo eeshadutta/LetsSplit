@@ -49,11 +49,13 @@ class transactions(DB.Model):
     from_user = DB.Column(DB.String(50))
     to_user = DB.Column(DB.String(50))
     amount = DB.Column(DB.String(10))
+    settled = DB.Column(DB.String(1))
 
-    def __init__(self, from_user, to_user, amount):
+    def __init__(self, from_user, to_user, amount, settled):
         self.from_user = from_user
         self.to_user = to_user
         self.amount = amount
+        self.settled = settled
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -114,7 +116,7 @@ def profile_page(username, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
                     DB.session.add(transaction)
                     DB.session.commit()
             elif request.form['to_user'] == username:
@@ -124,13 +126,18 @@ def profile_page(username, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
                     DB.session.add(transaction)
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
-        
-    return render_template('profile_page.html', username=username, user=user, message=message)
+        if 'log' in request.form:
+            return redirect(url_for('log', username=username))
+
+    to_list = transactions.query.filter_by(from_user=username).all()
+    from_list = transactions.query.filter_by(to_user=username).all()
+
+    return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
 
 
 @app.route('/<username>/search/<query>', methods=['GET', 'POST'])
@@ -169,7 +176,7 @@ def search_results(username, query, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False)
                     DB.session.add(transaction)
                     DB.session.commit()
             elif request.form['to_user'] == username:
@@ -179,13 +186,53 @@ def search_results(username, query, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False)
                     DB.session.add(transaction)
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
 
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
+
+
+@app.route('/<username>/history', methods=['GET', 'POST'])
+def log(username, message=None):
+    user = users.query.filter_by(username=username).first()
+    if request.method == 'POST':
+        if 'search' in request.form:
+            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
+        if 'logout' in request.form:
+            return redirect(url_for('sign_up'))
+        if 'add_transaction' in request.form:
+            if request.form['from_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['from_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['to_user'] not in friend_list:
+                    message = request.form['to_user'] + " is not a friend"
+                else:
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            elif request.form['to_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['to_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['from_user'] not in friend_list:
+                    message = request.form['from_user'] + " is not a friend"
+                else:
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            else:
+                message = "You can only add your own transactions"
+        if 'log' in request.form:
+            return redirect(url_for('log', username=username))
+
+    to_list = transactions.query.filter_by(from_user=username).all()
+    from_list = transactions.query.filter_by(to_user=username).all()
+
+    return render_template('log.html', username=username, user=user, to_list=to_list, from_list=from_list, message=message)
 
 
 if __name__ == '__main__':

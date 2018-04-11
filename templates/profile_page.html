@@ -45,6 +45,11 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
                             <div class="form-group">
+                                <button type="submit" name="log" class="btn btn-primary btn-lg">History</button>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <div class="form-group">
                                 <input type="text" name="search_name" class="form-control form-control-lg" placeholder="Search.....">
                             </div>
                         </li>
@@ -121,7 +126,29 @@
                 </div>
             </div>
             <div class="col offset-md-6">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>                Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores, voluptatem dignissimos. Similique, rem illo dicta, dolore perspiciatis labore, nemo beatae eaque nesciunt facilis iusto iure asperiores possimus eligendi alias voluptates.<br>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Friend</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for friend in to_list %} {% if friend.settled == "0" %}
+                            <tr>
+                                <td>{{ friend.to_user }}</td>
+                                <td>-{{ friend.amount }}</td>
+                            </tr>
+                            {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "0" %}
+                            <tr>
+                                <td>{{ friend.from_user }}</td>
+                                <td>+{{ friend.amount }}</td>
+                            </tr>
+                            {% endif %} {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
