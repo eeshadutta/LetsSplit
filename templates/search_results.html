@@ -75,7 +75,14 @@
                             <input type="amount" name="amount" class="form-control" placeholder="Amount" required>
                         </div>
                     </div>
-
+                    {% if message %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                        <script>
+                            $('#AddTransactionModal').modal('show')
+                        </script>
+                    </div>
+                    {% endif %}
                     <div class="modal-footer">
                         <button type="submit" name="add_transaction" class="btn btn-primary btn-block">Add this Transaction</button>
                     </div>

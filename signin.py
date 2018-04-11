@@ -162,9 +162,28 @@ def search_results(username, query, message=None):
             friend_list = fr1.friend.split(',')
             DB.session.commit()
         if 'add_transaction' in request.form:
-            transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
-            DB.session.add(transaction)
-            DB.session.commit()
+            if request.form['from_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['from_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['to_user'] not in friend_list:
+                    message = request.form['to_user'] + " is not a friend"
+                else:
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            elif request.form['to_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['to_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['from_user'] not in friend_list:
+                    message = request.form['from_user'] + " is not a friend"
+                else:
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'])
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            else:
+                message = "You can only add your own transactions"
 
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
 
