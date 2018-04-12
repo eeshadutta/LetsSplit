@@ -240,6 +240,21 @@ def log(username, message=None):
 
     return render_template('log.html', username=username, user=user, to_list=to_list, from_list=from_list, message=message)
 
+@app.route('/<username>/search/<query>/profile', methods = ['GET', 'POST'])
+def open_else_profile(username, query):
+    x = transactions.query.filter_by(to_user=query).filter_by(from_user=username).all()
+    y = transactions.query.filter_by(from_user=query).filter_by(to_user=username).all()
+    print(x)
+    print(y)
+    query_user = users.query.filter_by(username=query).first()
+    if request.method == 'POST':
+        if 'search' in request.form:
+            print(request.form)
+            return redirect(url_for('search_results', username=username, query=request.form['search_name']))
+        if 'logout' in request.form:
+            return redirect(url_for('sign_up'))
+    #print(query_user)
+    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list = x, to_list = y)
 
 if __name__ == '__main__':
     DB.create_all()
