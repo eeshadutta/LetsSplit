@@ -138,6 +138,7 @@
                                 <th>
                                     <center>Settle</center>
                                 </th>
+                                <th>Created On</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -149,6 +150,7 @@
                                 <td>
                                     <center>You cannot settle this</center>
                                 </td>
+                                <td>{{ friend.date_created }}</td>
                             </tr>
                             {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "0" %}
                             <tr>
@@ -161,6 +163,7 @@
                                         <button type="submit" name="settle" class="btn btn-primary btn-lg btn-block bg-primary">Settle</button>
                                     </form>
                                 </td>
+                                <td>{{ friend.date_created }}</td>
                             </tr>
                             {% endif %} {% endfor %}
                         </tbody>

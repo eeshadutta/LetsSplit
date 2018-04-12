@@ -4,6 +4,7 @@ from werkzeug import secure_filename
 from wtforms import StringField
 from wtforms.validators import DataRequired
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.sqlite3'
@@ -50,12 +51,14 @@ class transactions(DB.Model):
     to_user = DB.Column(DB.String(50))
     amount = DB.Column(DB.String(10))
     settled = DB.Column(DB.String(1))
+    date_created = DB.Column(DB.String(50))
 
-    def __init__(self, from_user, to_user, amount, settled):
+    def __init__(self, from_user, to_user, amount, settled, date_created):
         self.from_user = from_user
         self.to_user = to_user
         self.amount = amount
         self.settled = settled
+        self.date_created = date_created
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -116,7 +119,8 @@ def profile_page(username, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
             elif request.form['to_user'] == username:
@@ -126,7 +130,8 @@ def profile_page(username, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                    
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
             else:
@@ -180,7 +185,8 @@ def search_results(username, query, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False)
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False, date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
             elif request.form['to_user'] == username:
@@ -190,7 +196,8 @@ def search_results(username, query, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False)
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False, date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
             else:
@@ -217,7 +224,8 @@ def log(username, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
             elif request.form['to_user'] == username:
@@ -227,7 +235,8 @@ def log(username, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0")
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
             else:
@@ -240,12 +249,11 @@ def log(username, message=None):
 
     return render_template('log.html', username=username, user=user, to_list=to_list, from_list=from_list, message=message)
 
+
 @app.route('/<username>/search/<query>/profile', methods = ['GET', 'POST'])
 def open_else_profile(username, query):
     x = transactions.query.filter_by(to_user=query).filter_by(from_user=username).all()
     y = transactions.query.filter_by(from_user=query).filter_by(to_user=username).all()
-    print(x)
-    print(y)
     query_user = users.query.filter_by(username=query).first()
     if request.method == 'POST':
         if 'search' in request.form:
@@ -253,7 +261,6 @@ def open_else_profile(username, query):
             return redirect(url_for('search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
-    #print(query_user)
     return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list = x, to_list = y)
 
 if __name__ == '__main__':
