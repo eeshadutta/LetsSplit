@@ -82,7 +82,7 @@
                             <input type="amount" name="amount" class="form-control" placeholder="Amount" required>
                         </div>
                     </div>
-                    {% if message %}
+                    {% if message and message != "Oops... No results found" %}
                     <div class="alert alert-danger">
                         {{ message }}
                         <script>
@@ -105,7 +105,9 @@
             <div class="card col-md-5 bg-primary text-white" style="margin-top:1vw;">
                 <img class="card-img-top img-thumbnail" src="../../static/{{ user.profile_pic }}" alt="Card Image" style="position:relative; top:2%;">
                 <div class="card-body">
-                   <a  class="text-decoration: none;" href="{{ user.username }}/profile"> <h4 class="card-title card-header" style="color:white">Name: {{ user.name }}</h4></a>
+                    <a class="text-decoration: none;" href="{{ user.username }}/profile">
+                        <h4 class="card-title card-header" style="color:white">Name: {{ user.name }}</h4>
+                    </a>
                     <div class="card-text card-body  ">Username: {{ user.username }}</div>
                     <div class="card-text card-footer">Email: {{ user.email }}</div>
                     {% if user.username not in friend_list %}

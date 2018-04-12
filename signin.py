@@ -52,13 +52,15 @@ class transactions(DB.Model):
     amount = DB.Column(DB.String(10))
     settled = DB.Column(DB.String(1))
     date_created = DB.Column(DB.String(50))
+    date_settled = DB.Column(DB.String(50))
 
-    def __init__(self, from_user, to_user, amount, settled, date_created):
+    def __init__(self, from_user, to_user, amount, settled, date_created, date_settled=''):
         self.from_user = from_user
         self.to_user = to_user
         self.amount = amount
         self.settled = settled
         self.date_created = date_created
+        self.date_settled = date_settled
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -141,6 +143,8 @@ def profile_page(username, message=None):
         if 'settle' in request.form:
             transaction = transactions.query.get(request.form['primary_id'])
             transaction.settled = "1"
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
+            transaction.date_settled = date_settled                  
             DB.session.commit()
 
     to_list = transactions.query.filter_by(from_user=username).all()

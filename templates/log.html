@@ -134,6 +134,8 @@
                             <tr>
                                 <th>Friend</th>
                                 <th>Amount</th>
+                                <th>Date Created</th>
+                                <th>Date Settled</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,11 +143,15 @@
                             <tr>
                                 <td>{{ friend.to_user }}</td>
                                 <td>-{{ friend.amount }}</td>
+                                <td>{{ friend.date_created }}</td>
+                                <td>{{ friend.date_settled }}</td>
                             </tr>
                             {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "1" %}
                             <tr>
                                 <td>{{ friend.from_user }}</td>
                                 <td>+{{ friend.amount }}</td>
+                                <td>{{ friend.date_created }}</td>
+                                <td>{{ friend.date_settled }}</td>
                             </tr>
                             {% endif %} {% endfor %}
                         </tbody>
