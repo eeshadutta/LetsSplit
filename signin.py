@@ -131,7 +131,7 @@ def profile_page(username, message=None):
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
-        elif 'log' in request.form:
+        if 'log' in request.form:
             return redirect(url_for('log', username=username))
 
     to_list = transactions.query.filter_by(from_user=username).all()
@@ -191,7 +191,8 @@ def search_results(username, query, message=None):
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
-                
+        if 'log' in request.form:
+            return redirect(url_for('log', username=username))
 
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
 
