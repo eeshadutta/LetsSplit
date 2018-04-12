@@ -133,6 +133,10 @@ def profile_page(username, message=None):
                 message = "You can only add your own transactions"
         if 'log' in request.form:
             return redirect(url_for('log', username=username))
+        if 'settle' in request.form:
+            transaction = transactions.query.get(request.form['primary_id'])
+            transaction.settled = "1"
+            DB.session.commit()
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
