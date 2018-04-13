@@ -20,7 +20,7 @@
         <div class="col offset-md-6">
             <h3 class="text-center">Your Unsettled Transactions</h3><br><br>
             <div class="table-responsive">
-                <table class="table">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <th style="display:none">ID</th>
@@ -32,25 +32,39 @@
                     </thead>
                     <tbody>
                         {% for friend in to_list %} {% if friend.settled == "0" %}
-                        <tr>
+                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.date_created}}">
                             <td style="display:none">{{ friend.primary_id }}</td>
                             <td class="text-center">{{ friend.to_user }}</td>
                             <td class="text-center">-{{ friend.amount }}</td>
                             <td class="text-center">You cannot settle this</td>
                             <td class="text-center">{{ friend.date_created }}</td>
                         </tr>
-                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "0" %}
                         <tr>
+                            <td colspan="4">
+                                <div id="{{friend.date_created}}" class="collapse">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "0" %}
+                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.date_created}}">
                             <td style="display:none">{{ friend.primary_id }}</td>
                             <td class="text-center">{{ friend.from_user }}</td>
                             <td class="text-center">+{{ friend.amount }}</td>
                             <td>
                                 <form action="{{ request.path }}" method="post">
                                     <input type="text" name="primary_id" value="{{ friend.id }}" class="form-control form-control-lg" style="display:none">
-                                    <button type="submit" name="settle" class="btn btn-primary btn-lg btn-block bg-primary">Settle</button>
+                                    <button type="submit" name="settle" class="btn btn-primary btn-sm btn-block bg-primary">Settle</button>
                                 </form>
                             </td>
                             <td class="text-center">{{ friend.date_created }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div id="{{friend.date_created}}" class="collapse">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.
+                                </div>
+                            </td>
                         </tr>
                         {% endif %} {% endfor %}
                     </tbody>

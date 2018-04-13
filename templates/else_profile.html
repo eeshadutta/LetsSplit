@@ -21,7 +21,7 @@
             <h3 class="text-center">Your Transactions with {{ query_user.name }}</h3><br><br>
             <h4 class="text-center">Unsettled Transactions</h4>
             <div class="table-responsive">
-                <table class="table">
+                <table class="table table-triped">
                     <thead>
                         <tr>
                             <th class="text-center">Amount</th>
@@ -31,13 +31,20 @@
                     </thead>
                     <tbody>
                         {% for friend in to_list %} {% if friend.to_user == username and friend.settled == "0" %}
-                        <tr>
+                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.id}}">
                             <td class="text-center">-{{ friend.amount }}</td>
                             <td class="text-center">You cannot settle this</td>
                             <td class="text-center">{{ friend.date_created }}</td>
                         </tr>
-                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "0" %}
                         <tr>
+                            <td colspan="4">
+                                <div id="{{friend.id}}" class="collapse">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "0" %}
+                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.id}}">
                             <td class="text-center">+{{ friend.amount }}</t>
                                 <td>
                                     <form action="{{ request.path }}" method="post">
@@ -47,13 +54,20 @@
                                 </td>
                                 <td class="text-center">{{ friend.date_created }}</td>
                         </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div id="{{friend.id}}" class="collapse">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.
+                                </div>
+                            </td>
+                        </tr>
                         {% endif %} {% endfor %}
                     </tbody>
                 </table>
             </div><br>
             <h4 class="text-center">Settled Transactions</h4>
             <div class="table-responsive">
-                <table class="table">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <th class="text-center">Amount</th>
@@ -63,16 +77,30 @@
                     </thead>
                     <tbody>
                         {% for friend in to_list %} {% if friend.to_user == username and friend.settled == "1" %}
-                        <tr>
+                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.id}}">
                             <td class="text-center">-{{ friend.amount }}</td>
                             <td class="text-center">{{ friend.date_created }}</td>
                             <td class="text-center">{{ friend.date_settled }}</td>
                         </tr>
-                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "1" %}
                         <tr>
+                            <td colspan="4">
+                                <div id="{{friend.id}}" class="collapse">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "1" %}
+                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.id}}">
                             <td class="text-center">+{{ friend.amount }}</td>
                             <td class="text-center">{{ friend.date_created }}</td>
                             <td class="text-center">{{ friend.date_settled }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div id="{{friend.id}}" class="collapse">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.
+                                </div>
+                            </td>
                         </tr>
                         {% endif %} {% endfor %}
                     </tbody>
