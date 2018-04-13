@@ -18,10 +18,10 @@
             </div>
         </div>
         <div class="col offset-md-6">
-            <h3 class="text-center">Your Transactions with {{ query_user.name }}</h3><br><br>
-            <h4 class="text-center">Unsettled Transactions</h4>
+            <h3 class="text-center text-light">Your Transactions with {{ query_user.name }}</h3><br><br>
+            <h4 class="text-center text-light">Unsettled Transactions</h4>
             <div class="table-responsive">
-                <table class="table table-triped">
+                <table class="table table-triped text-white">
                     <thead>
                         <tr>
                             <th class="text-center">Amount</th>
@@ -49,7 +49,7 @@
                                 <td>
                                     <form action="{{ request.path }}" method="post">
                                         <input type="text" name="primary_id" value="{{ friend.id }}" class="form-control form-control-lg" style="display:none">
-                                        <button type="submit" name="settle" class="btn btn-primary btn-lg btn-block bg-primary">Settle</button>
+                                        <button type="submit" name="settle" class="btn btn-primary btn-sm btn-block bg-primary">Settle</button>
                                     </form>
                                 </td>
                                 <td class="text-center">{{ friend.date_created }}</td>
@@ -65,9 +65,9 @@
                     </tbody>
                 </table>
             </div><br>
-            <h4 class="text-center">Settled Transactions</h4>
+            <h4 class="text-center text-light">Settled Transactions</h4>
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped text-light">
                     <thead>
                         <tr>
                             <th class="text-center">Amount</th>
