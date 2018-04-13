@@ -83,7 +83,18 @@
                         <tr>
                             <td colspan="4">
                                 <div id="{{friend.date_created}}" class="collapse">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.
+                                        {%for comment in friend.comments.split(',')%}
+                                        {%if comment%}
+                                        {%set x = comment.split(' ')%}
+                                             <h5>
+                                                 {{ x[0] }}
+                                             </h5>
+                                             <h6>
+                                                 {{ " ".join(x[1:]) }}
+                                             </h6>
+                                             <br>
+                                         {%endif%}
+                                        {%endfor%}
                                 </div>
                             </td>
                         </tr>
