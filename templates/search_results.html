@@ -6,9 +6,13 @@
         <div class="card col-md-5 bg-primary text-white" style="margin-top:1vw;">
             <img class="card-img-top img-thumbnail" src="../../static/{{ user.profile_pic }}" alt="Card Image" style="position:relative; top:2%;">
             <div class="card-body">
+                {% if user.username in friend_list %}
                 <a class="text-decoration: none;" href="{{ user.username }}/profile">
                     <h4 class="card-title card-header" style="color:white">Name: {{ user.name }}</h4>
                 </a>
+                {% else %}
+                <h4 class="card-title card-header" style="color:white">Name: {{ user.name }}</h4>
+                {% endif %}
                 <div class="card-text card-body  ">Username: {{ user.username }}</div>
                 <div class="card-text card-footer">Email: {{ user.email }}</div>
                 {% if user.username not in friend_list %}
