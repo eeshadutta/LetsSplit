@@ -53,6 +53,7 @@ class transactions(DB.Model):
     settled = DB.Column(DB.String(1))
     date_created = DB.Column(DB.String(50))
     date_settled = DB.Column(DB.String(50))
+    comments = DB.Column(DB.String(10000))
 
     def __init__(self, from_user, to_user, amount, settled, date_created, date_settled=''):
         self.from_user = from_user
@@ -61,6 +62,7 @@ class transactions(DB.Model):
         self.settled = settled
         self.date_created = date_created
         self.date_settled = date_settled
+        self.comments = ''
 
 
 @app.route('/', methods = ['GET', 'POST'])
@@ -145,6 +147,12 @@ def profile_page(username, message=None):
             transaction.settled = "1"
             date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
             transaction.date_settled = date_settled                  
+            DB.session.commit()
+        if 'comment_add' in request.form:
+            x = transactions.query.get(request.form['transaction_id'])
+            print(request.form['transaction_id'])
+            print(x)
+            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
 
     to_list = transactions.query.filter_by(from_user=username).all()
@@ -247,6 +255,13 @@ def log(username, message=None):
                 message = "You can only add your own transactions"
         if 'log' in request.form:
             return redirect(url_for('log', username=username))
+        if 'comment_add' in request.form:
+            x = transactions.query.get(request.form['transaction_id'])
+            print(request.form['transaction_id'])
+            print(x)
+            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
+            DB.session.commit()
+
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -295,6 +310,13 @@ def open_else_profile(username, query, message=None):
             date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
             transaction.date_settled = date_settled                  
             DB.session.commit()
+        if 'comment_add' in request.form:
+            x = transactions.query.get(request.form['transaction_id'])
+            print(request.form['transaction_id'])
+            print(x)
+            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
+            DB.session.commit()
+
 
     to_list = transactions.query.filter_by(from_user=query).all()
     from_list = transactions.query.filter_by(to_user=query).all()
