@@ -46,12 +46,16 @@
                                    {%for comment in friend.comments.split(',')%}
                                    {%if comment%}
                                    {%set x = comment.split(' ')%}
-                                        <h5>
+                                        <!--<h5>
                                             {{ x[0] }}
                                         </h5>
                                         <h6>
                                             {{ " ".join(x[1:]) }}
                                         </h6>
+                                        <br>-->
+                                        <span class="badge badge-pill badge-primary">
+                                            <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
+                                        </span>
                                         <br>
                                     {%endif%}
                                    {%endfor%}
