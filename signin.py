@@ -255,17 +255,46 @@ def log(username, message=None):
 
 
 @app.route('/<username>/search/<query>/profile', methods = ['GET', 'POST'])
-def open_else_profile(username, query):
-    x = transactions.query.filter_by(to_user=query).filter_by(from_user=username).all()
-    y = transactions.query.filter_by(from_user=query).filter_by(to_user=username).all()
+def open_else_profile(username, query, message=None):
     query_user = users.query.filter_by(username=query).first()
     if request.method == 'POST':
         if 'search' in request.form:
-            print(request.form)
             return redirect(url_for('search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('sign_up'))
-    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list = x, to_list = y)
+        if 'add_transaction' in request.form:
+            if request.form['from_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['from_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['to_user'] not in friend_list:
+                    message = request.form['to_user'] + " is not a friend"
+                else:
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            elif request.form['to_user'] == username:
+                friend_list = []
+                x = friends.query.filter_by(username=request.form['to_user']).first()
+                friend_list = x.friend.split(',')
+                if request.form['from_user'] not in friend_list:
+                    message = request.form['from_user'] + " is not a friend"
+                else:
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
+                    DB.session.add(transaction)
+                    DB.session.commit()
+            else:
+                message = "You can only add your own transactions"
+        if 'log' in request.form:
+            return redirect(url_for('log', username=username))
+
+    to_list = transactions.query.filter_by(from_user=username).all()
+    from_list = transactions.query.filter_by(to_user=username).all()
+
+    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message)
+
 
 if __name__ == '__main__':
     DB.create_all()
