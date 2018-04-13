@@ -45,14 +45,14 @@
                         </tr>
                         {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "0" %}
                         <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.id}}">
-                            <td class="text-center">+{{ friend.amount }}</t>
-                                <td>
-                                    <form action="{{ request.path }}" method="post">
-                                        <input type="text" name="primary_id" value="{{ friend.id }}" class="form-control form-control-lg" style="display:none">
-                                        <button type="submit" name="settle" class="btn btn-primary btn-sm btn-block bg-primary">Settle</button>
-                                    </form>
-                                </td>
-                                <td class="text-center">{{ friend.date_created }}</td>
+                            <td class="text-center">+{{ friend.amount }}</td>
+                            <td>
+                                <form action="{{ request.path }}" method="post">
+                                    <input type="text" name="primary_id" value="{{ friend.id }}" class="form-control form-control-lg" style="display:none">
+                                    <button type="submit" name="settle" class="btn btn-primary btn-sm btn-block bg-primary">Settle</button>
+                                </form>
+                            </td>
+                            <td class="text-center">{{ friend.date_created }}</td>
                         </tr>
                         <tr>
                             <td colspan="4">
