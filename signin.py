@@ -289,9 +289,15 @@ def open_else_profile(username, query, message=None):
                 message = "You can only add your own transactions"
         if 'log' in request.form:
             return redirect(url_for('log', username=username))
+        if 'settle' in request.form:
+            transaction = transactions.query.get(request.form['primary_id'])
+            transaction.settled = "1"
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
+            transaction.date_settled = date_settled                  
+            DB.session.commit()
 
-    to_list = transactions.query.filter_by(from_user=username).all()
-    from_list = transactions.query.filter_by(to_user=username).all()
+    to_list = transactions.query.filter_by(from_user=query).all()
+    from_list = transactions.query.filter_by(to_user=query).all()
 
     return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message)
 

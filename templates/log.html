@@ -18,30 +18,31 @@
             </div>
         </div>
         <div class="col offset-md-6">
+            <h3 class="text-center">Your Settled Transactions</h3><br><br>
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Friend</th>
-                            <th>Amount</th>
-                            <th>Date Created</th>
-                            <th>Date Settled</th>
+                            <th class="text-center">Friend</th>
+                            <th class="text-center">Amount</th>
+                            <th class="text-center">Created On</th>
+                            <th class="text-center">Settled On</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for friend in to_list %} {% if friend.settled == "1" %}
                         <tr>
-                            <td>{{ friend.to_user }}</td>
-                            <td>-{{ friend.amount }}</td>
-                            <td>{{ friend.date_created }}</td>
-                            <td>{{ friend.date_settled }}</td>
+                            <td class="text-center">{{ friend.to_user }}</td>
+                            <td class="text-center">-{{ friend.amount }}</td>
+                            <td class="text-center">{{ friend.date_created }}</td>
+                            <td class="text-center">{{ friend.date_settled }}</td>
                         </tr>
                         {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "1" %}
                         <tr>
-                            <td>{{ friend.from_user }}</td>
-                            <td>+{{ friend.amount }}</td>
-                            <td>{{ friend.date_created }}</td>
-                            <td>{{ friend.date_settled }}</td>
+                            <td class="text-center">{{ friend.from_user }}</td>
+                            <td class="text-center">+{{ friend.amount }}</td>
+                            <td class="text-center">{{ friend.date_created }}</td>
+                            <td class="text-center">{{ friend.date_settled }}</td>
                         </tr>
                         {% endif %} {% endfor %}
                     </tbody>
