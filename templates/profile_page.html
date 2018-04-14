@@ -2,7 +2,7 @@
 <div class="container" style="margin-top:3vw">
     <div class="row">
         <div class="col-sm-6 col-md-6 col-xs-6" id="left">
-            <div class="card bg-primary text-light">
+            <div class="card bg-success text-light">
                 <img src="./static/{{user.profile_pic}}" alt="Profile Picture" class="card-img-top img-thumbnail">
                 <div class="card-body">
                     <h4 class="card-title card-header">
@@ -18,8 +18,8 @@
             </div>
         </div>
         <div class="col offset-md-6">
-            <h3 class="text-center text-white">Your Unsettled Transactions</h3><br><br>
-            <div class="table-responsive text-white">
+            <h3 class="text-center text-success">Your Unsettled Transactions</h3><br><br>
+            <div class="table-responsive text-success">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -32,12 +32,12 @@
                     </thead>
                     <tbody>
                         {% for friend in to_list %} {% if friend.settled == "0" %}
-                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.date_created}}">
+                        <tr class="clickable btn-success" data-toggle="collapse" data-target="#{{friend.date_created}}">
                             <td style="display:none">{{ friend.primary_id }}</td>
-                            <td class="text-center">{{ friend.to_user }}</td>
-                            <td class="text-center">-{{ friend.amount }}</td>
-                            <td class="text-center">You cannot settle this</td>
-                            <td class="text-center">{{ friend.date_created }}</td>
+                            <td class="text-center text-success">{{ friend.to_user }}</td>
+                            <td class="text-center text-success">-{{ friend.amount }}</td>
+                            <td class="text-center text-success">You cannot settle this</td>
+                            <td class="text-center text-success">{{ friend.date_created }}</td>
                         </tr>
                         <tr>
                             <td colspan="4">
@@ -53,7 +53,7 @@
                                             {{ " ".join(x[1:]) }}
                                         </h6>
                                         <br>-->
-                                        <span class="badge badge-pill badge-primary">
+                                        <span class="badge badge-pill badge-success">
                                             <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
                                         </span>
                                         <br>
@@ -65,21 +65,21 @@
                                             <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
                                             <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
                                             <input type="text" name="transaction_id" style="display:none" value="{{ friend.id }}">
-                                            <button type="submit" class="btn btn-sm btn-primary bg-primary" name="comment_add">Add Comment</button>
+                                            <button type="submit" class="btn btn-sm btn-success bg-success" name="comment_add">Add Comment</button>
                                         </div>
                                    </form>
                                 </div>
                             </td>
                         </tr>
                         {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "0" %}
-                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.date_created}}">
+                        <tr class="clickable btn-success text-success" data-toggle="collapse" data-target="#{{friend.date_created}}">
                             <td style="display:none">{{ friend.primary_id }}</td>
-                            <td class="text-center">{{ friend.from_user }}</td>
-                            <td class="text-center">+{{ friend.amount }}</td>
+                            <td class="text-center text-success">{{ friend.from_user }}</td>
+                            <td class="text-center text-success">+{{ friend.amount }}</td>
                             <td>
                                 <form action="{{ request.path }}" method="post">
                                     <input type="text" name="primary_id" value="{{ friend.id }}" class="form-control form-control-lg" style="display:none">
-                                    <button type="submit" name="settle" class="btn btn-primary btn-sm btn-block bg-primary">Settle</button>
+                                    <button type="submit" name="settle" class="btn btn-success btn-sm btn-block bg-success">Settle</button>
                                 </form>
                             </td>
                             <td class="text-center">{{ friend.date_created }}</td>
@@ -98,7 +98,7 @@
                                                      {{ " ".join(x[1:]) }}
                                                  </h6>
                                                  <br>-->
-                                                 <span class="badge badge-pill badge-primary">
+                                                 <span class="badge badge-pill badge-success">
                                                      <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
                                                  </span>
                                                  <br>
@@ -110,7 +110,7 @@
                                                      <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
                                                      <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
                                                      <input type="text" name="transaction_id" style="display:none" value="{{ friend.id }}">
-                                                     <button type="submit" class="btn btn-sm btn-primary bg-primary" name="comment_add">Add Comment</button>
+                                                     <button type="submit" class="btn btn-sm btn-success bg-success" name="comment_add">Add Comment</button>
                                                  </div>
                                             </form>
                                          </div>
