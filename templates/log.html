@@ -2,7 +2,7 @@
 <div class="container" style="margin-top:3vw">
     <div class="row">
         <div class="col-sm-6 col-md-6 col-xs-6" id="left">
-            <div class="card bg-primary text-light">
+            <div class="card bg-success text-light">
                 <img src="../../static/{{user.profile_pic}}" alt="Profile Picture" class="card-img-top img-thumbnail">
                 <div class="card-body">
                     <h4 class="card-title card-header">
@@ -18,9 +18,9 @@
             </div>
         </div>
         <div class="col offset-md-6">
-            <h3 class="text-center text-light">Your Settled Transactions</h3><br><br>
+            <h3 class="text-center text-success">Your Settled Transactions</h3><br><br>
             <div class="table-responsive">
-                <table class="table table-hover text-white">
+                <table class="table table-striped text-success">
                     <thead>
                         <tr>
                             <th class="text-center">Friend</th>
@@ -31,11 +31,11 @@
                     </thead>
                     <tbody>
                         {% for friend in to_list %} {% if friend.settled == "1" %}
-                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.id}}">
-                            <td class="text-center">{{ friend.to_user }}</td>
-                            <td class="text-center">-{{ friend.amount }}</td>
-                            <td class="text-center">{{ friend.date_created }}</td>
-                            <td class="text-center">{{ friend.date_settled }}</td>
+                        <tr class="clickable btn-success" data-toggle="collapse" data-target="#{{friend.id}}">
+                            <td class="text-center text-success">{{ friend.to_user }}</td>
+                            <td class="text-center text-success">-{{ friend.amount }}</td>
+                            <td class="text-center text-success">{{ friend.date_created }}</td>
+                            <td class="text-center text-success">{{ friend.date_settled }}</td>
                         </tr>
                         <tr>
                             <td colspan="4">
@@ -43,7 +43,7 @@
                                         {%for comment in friend.comments.split(',')%}
                                             {%if comment%}
                                             {%set x = comment.split(' ')%}
-                                            <span class="badge badge-pill badge-primary">
+                                            <span class="badge badge-pill badge-success">
                                                     <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
                                                 </span>
                                                 <br>
@@ -53,18 +53,18 @@
                                             <div class="input-group">
                                                  <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
                                                  <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
-                                                 <button type="submit" class="btn btn-sm btn-primary bf-primary">Add Comment</button>
+                                                 <button type="submit" class="btn btn-sm btn-success bg-success">Add Comment</button>
                                              </div>
                                         </form>
                                 </div>
                             </td>
                         </tr>
                         {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.settled == "1" %}
-                        <tr class="clickable btn-primary" data-toggle="collapse" data-target="#{{friend.id}}">
-                            <td class="text-center">{{ friend.from_user }}</td>
-                            <td class="text-center">+{{ friend.amount }}</td>
-                            <td class="text-center">{{ friend.date_created }}</td>
-                            <td class="text-center">{{ friend.date_settled }}</td>
+                        <tr class="clickable btn-success" data-toggle="collapse" data-target="#{{friend.id}}">
+                            <td class="text-center text-success">{{ friend.from_user }}</td>
+                            <td class="text-center text-success">+{{ friend.amount }}</td>
+                            <td class="text-center text-success">{{ friend.date_created }}</td>
+                            <td class="text-center text-success">{{ friend.date_settled }}</td>
                         </tr>
                         <tr>
                             <td colspan="4">
@@ -73,7 +73,7 @@
                                             {%for comment in friend.comments.split(',')%}
                                             {%if comment%}
                                             {%set x = comment.split(' ')%}
-                                            <span class="badge badge-pill badge-primary">
+                                            <span class="badge badge-pill badge-success">
                                                     <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
                                                 </span>
                                                 <br>
@@ -85,7 +85,7 @@
                                                      <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
                                                      <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
                                                      <input type="text" name="transaction_id" style="display:none" value="{{ friend.id }}">
-                                                     <button type="submit" class="btn btn-sm btn-primary bg-primary" name="comment_add">Add Comment</button>
+                                                     <button type="submit" class="btn btn-sm btn-success bg-success" name="comment_add">Add Comment</button>
                                                  </div>
                                             </form>
                                          </div>
