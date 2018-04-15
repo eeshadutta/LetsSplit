@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Let's Split</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Tangerine">
+    <style>
+        #Home {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            font-size: 250%;
+        }
+        
+        .Logo {
+            position: relative;
+            top: 10vw;
+        }
+        
+        .description {
+            position: relative;
+            top: 6vw;
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            line-height: 60px;
+        }
+        
+        .copyright {
+            position: relative;
+        }
+        
+        .contact {
+            position: relative;
+            left: 23vw;
+        }
+    </style>
+
+</head>
+
+<body style="background-color:papayawhip">
+    <nav class="navbar bg-success navbar-expand-md navbar-dark">
+        <div class="container">
+            <a href="/" class="navbar-brand" id="Home">Let's Split</a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <button class="btn btn-success btn-lg" data-toggle="modal" data-target="#LogInModal">Log In</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-success btn-lg" data-toggle="modal" data-target="#SignUpModal">Sign Up</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="modal fade" id="LogInModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">
+                        Log In
+                    </h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <form role="form" action="{{ request.path }}" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="username" name="username" class="form-control" placeholder="Username" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        </div>
+
+                        {% if message and message != 'Username already taken' %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                            <script>
+                                $('#LogInModal').modal('show')
+                            </script>
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" name="SignIn" class="btn btn-success btn-block">Sign In</button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="SignUpModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">
+                        Sign Up
+                    </h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        {% if img_src%}
+                        <div class="form-group">
+                            <img src="{{ img_src }}" alt="profile_pic" class="img-fluid">
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <input type="file" name="profile_pic" class="form-control" placeholder="Select Profile Picture" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control" placeholder="Enter Email Address" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="name" class="form-control" placeholder="Enter Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="username" name="username" class="form-control" placeholder="Enter Username" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="password" class="form-control" placeholder="Enter Password" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="passwordconfirm" class="form-control" placeholder="Re-Enter Password" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="bio" id="" cols="49" rows="5" placeholder="Say Something About Yourself">
+                                        Say Something About Yourself
+                                   </textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="DOB" class="form-control" placeholder="Enter Date Of Birth" required>
+                        </div>
+                    </div>
+                    {% if message and message == 'Username already taken' or message == 'Passwords Don\'t Match' %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                        <script>
+                            $('#SignUpModal').modal('show')
+                        </script>
+                    </div>
+                    {% endif %}
+
+                    <div class="modal-footer">
+                        <input type="submit" value="Submit" name="SignUp" class="btn btn-success btn-block">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="Logo col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                <img src="{{url_for('static', filename='logo.png')}}" alt="logo" width="550vw" class="img-fluid">
+            </div>
+
+            <div class="description col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat sunt ullam repellat saepe accusamus, accusantium ab nesciunt esse amet? Tenetur eaque in eius harum nam pariatur rem numquam nihil facere?</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat sunt ullam repellat saepe accusamus, accusantium ab nesciunt esse amet? Tenetur eaque in eius harum nam pariatur rem numquam nihil facere?</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat sunt ullam repellat saepe accusamus, accusantium ab nesciunt esse amet? Tenetur eaque in eius harum nam pariatur rem numquam nihil facere?</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat sunt ullam repellat saepe accusamus, accusantium ab nesciunt esse amet? Tenetur eaque in eius harum nam pariatur rem numquam nihil facere?</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat sunt ullam repellat saepe accusamus, accusantium ab nesciunt esse amet? Tenetur eaque in eius harum nam pariatur rem numquam nihil facere?</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat sunt ullam repellat saepe accusamus, accusantium ab nesciunt esse amet? Tenetur eaque in eius harum nam pariatur rem numquam nihil facere?</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat sunt ullam repellat saepe accusamus, accusantium ab nesciunt esse amet? Tenetur eaque in eius harum nam pariatur rem numquam nihil facere?</p>
+            </div>
+        </div>
+    </div>
+    <footer class="footer  bg-success">
+        <div class="copyright container row">
+            <div class="offset-xs-2 offset-sm-2 offset-md-2 offset-lg-2 col-xs-6 col-sm-6 col-md-6 col-lg-6" style="color: white">
+                <p>&copy; Copyright 2018 Let's Split.All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var dateControl = document.querySelector('input[type="date"]');
+        dateControl.value = '2000-01-01';
+    </script>
+</body>
+
+</html>
