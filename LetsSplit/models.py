@@ -50,3 +50,13 @@ class transactions(DB.Model):
         self.date_created = date_created
         self.date_settled = date_settled
         self.comments = ''
+
+
+class groups(DB.Model):
+    id = DB.Column('user_id', DB.Integer, primary_key=True)
+    group_name = DB.Column(DB.String(50))
+    group_members = DB.Column(DB.String(5000))
+
+    def __init__(self, name, group_members):
+        self.group_name = name
+        self.group_members = group_members

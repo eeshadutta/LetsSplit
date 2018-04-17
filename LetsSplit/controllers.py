@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from werkzeug import secure_filename
 from datetime import datetime
 import os
-from models import DB, users, friends, transactions
+from models import DB, users, friends, transactions, groups
 
 
 app_blueprint = Blueprint('app_blueprint', __name__)
@@ -73,7 +73,9 @@ def profile_page(username, message=None):
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
         if 'friends' in request.form:
-            return redirect(url_for('app_blueprint.friends_display', username=username))        
+            return redirect(url_for('app_blueprint.friends_display', username=username))
+        if 'groups' in request.form:
+            return redirect(url_for('app_blueprint.groups_display', username=username))        
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -113,6 +115,8 @@ def search_results(username, query, message=None):
             return redirect(url_for('app_blueprint.log', username=username))
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username)) 
+        if 'groups' in request.form:
+            return redirect(url_for('app_blueprint.groups_display', username=username))
 
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
 
@@ -134,8 +138,9 @@ def log(username, message=None):
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
         if 'friends' in request.form:
-            return redirect(url_for('app_blueprint.friends_display', username=username)) 
-
+            return redirect(url_for('app_blueprint.friends_display', username=username))
+        if 'groups' in request.form:
+            return redirect(url_for('app_blueprint.groups_display', username=username)) 
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -166,7 +171,9 @@ def open_else_profile(username, query, message=None):
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
         if 'friends' in request.form:
-            return redirect(url_for('app_blueprint.friends_display', username=username)) 
+            return redirect(url_for('app_blueprint.friends_display', username=username))
+        if 'groups' in request.form:
+            return redirect(url_for('app_blueprint.groups_display', username=username)) 
 
     to_list = transactions.query.filter_by(from_user=query).all()
     from_list = transactions.query.filter_by(to_user=query).all()
@@ -194,9 +201,7 @@ def friends_display(username, message=None):
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
         if 'friends' in request.form:
-            x = friends.query.filter_by(username=username).first()
-            friend_list = x.friend.split(',')
-            print (friend_list) 
+            return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'add_transaction' in request.form:
             if request.form['from_user'] == username:
                 friend_list = []
@@ -222,5 +227,30 @@ def friends_display(username, message=None):
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
+        if 'groups' in request.form:
+            return redirect(url_for('app_blueprint.groups_display', username=username))
 
     return render_template('friends.html', username=username, user=user, friend_list=url_list, message=message)
+
+
+@app_blueprint.route('/<username>/groups', methods = ['GET', 'POST'])
+def groups_display(username):
+    user = users.query.filter_by(username=username).first() 
+    group_list = []
+    groups_all = groups.query.all()
+    for group in groups_all:
+        if username in group.group_members:
+            group_list.append(group)
+    if request.method == 'POST':    
+        if 'search' in request.form:
+            return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
+        if 'logout' in request.form:
+            return redirect(url_for('app_blueprint.sign_up'))
+        if 'log' in request.form:
+            return redirect(url_for('app_blueprint.log', username=username))
+        if 'friends' in request.form:
+            return redirect(url_for('app_blueprint.friends_display', username=username))
+        if 'groups' in request.form:
+            return redirect(url_for('app_blueprint.groups_display', username=username))
+
+    return render_template('all_groups.html', username=username, user=user, group_list=group_list)            
