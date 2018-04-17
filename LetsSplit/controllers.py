@@ -58,31 +58,6 @@ def profile_page(username, message=None):
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('app_blueprint.sign_up'))
-        if 'add_transaction' in request.form:
-            if request.form['from_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['from_user']).first()
-                friend_list = x.friend.split(',')
-                if request.form['to_user'] not in friend_list:
-                    message = request.form['to_user'] + " is not a friend"
-                else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
-                    DB.session.add(transaction)
-                    DB.session.commit()
-            elif request.form['to_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['to_user']).first()
-                friend_list = x.friend.split(',')
-                if request.form['from_user'] not in friend_list:
-                    message = request.form['from_user'] + " is not a friend"
-                else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                    
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
-                    DB.session.add(transaction)
-                    DB.session.commit()
-            else:
-                message = "You can only add your own transactions"
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
         if 'settle' in request.form:
@@ -97,6 +72,8 @@ def profile_page(username, message=None):
             print(x)
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
+        if 'friends' in request.form:
+            return redirect(url_for('app_blueprint.friends_display', username=username))        
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -132,33 +109,10 @@ def search_results(username, query, message=None):
             fr2.friend = a + username + ','
             friend_list = fr1.friend.split(',')
             DB.session.commit()
-        if 'add_transaction' in request.form:
-            if request.form['from_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['from_user']).first()
-                friend_list = x.friend.split(',')
-                if request.form['to_user'] not in friend_list:
-                    message = request.form['to_user'] + " is not a friend"
-                else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False, date_created=date_created)
-                    DB.session.add(transaction)
-                    DB.session.commit()
-            elif request.form['to_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['to_user']).first()
-                friend_list = x.friend.split(',')
-                if request.form['from_user'] not in friend_list:
-                    message = request.form['from_user'] + " is not a friend"
-                else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False, date_created=date_created)
-                    DB.session.add(transaction)
-                    DB.session.commit()
-            else:
-                message = "You can only add your own transactions"
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
+        if 'friends' in request.form:
+            return redirect(url_for('app_blueprint.friends_display', username=username)) 
 
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
 
@@ -171,31 +125,6 @@ def log(username, message=None):
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('app_blueprint.sign_up'))
-        if 'add_transaction' in request.form:
-            if request.form['from_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['from_user']).first()
-                friend_list = x.friend.split(',')
-                if request.form['to_user'] not in friend_list:
-                    message = request.form['to_user'] + " is not a friend"
-                else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
-                    DB.session.add(transaction)
-                    DB.session.commit()
-            elif request.form['to_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['to_user']).first()
-                friend_list = x.friend.split(',')
-                if request.form['from_user'] not in friend_list:
-                    message = request.form['from_user'] + " is not a friend"
-                else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
-                    transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
-                    DB.session.add(transaction)
-                    DB.session.commit()
-            else:
-                message = "You can only add your own transactions"
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
         if 'comment_add' in request.form:
@@ -204,6 +133,8 @@ def log(username, message=None):
             print(x)
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
+        if 'friends' in request.form:
+            return redirect(url_for('app_blueprint.friends_display', username=username)) 
 
 
     to_list = transactions.query.filter_by(from_user=username).all()
@@ -220,6 +151,52 @@ def open_else_profile(username, query, message=None):
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('app_blueprint.sign_up'))
+        if 'log' in request.form:
+            return redirect(url_for('app_blueprint.log', username=username))
+        if 'settle' in request.form:
+            transaction = transactions.query.get(request.form['primary_id'])
+            transaction.settled = "1"
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
+            transaction.date_settled = date_settled                  
+            DB.session.commit()
+        if 'comment_add' in request.form:
+            x = transactions.query.get(request.form['transaction_id'])
+            print(request.form['transaction_id'])
+            print(x)
+            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
+            DB.session.commit()
+        if 'friends' in request.form:
+            return redirect(url_for('app_blueprint.friends_display', username=username)) 
+
+    to_list = transactions.query.filter_by(from_user=query).all()
+    from_list = transactions.query.filter_by(to_user=query).all()
+
+    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message)
+
+
+@app_blueprint.route('/<username>/friends', methods = ['GET', 'POST'])
+def friends_display(username, message=None):
+    user = users.query.filter_by(username=username).first() 
+    x = []
+    friend_list = []
+    url_list = []
+    x = friends.query.filter_by(username=username).first()
+    friend_list = x.friend.split(',')
+    for y in friend_list:
+        if y != '':
+            z = users.query.filter_by(username=y).first()
+            url_list.append(z)
+    if request.method == 'POST':    
+        if 'search' in request.form:
+            return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
+        if 'logout' in request.form:
+            return redirect(url_for('app_blueprint.sign_up'))
+        if 'log' in request.form:
+            return redirect(url_for('app_blueprint.log', username=username))
+        if 'friends' in request.form:
+            x = friends.query.filter_by(username=username).first()
+            friend_list = x.friend.split(',')
+            print (friend_list) 
         if 'add_transaction' in request.form:
             if request.form['from_user'] == username:
                 friend_list = []
@@ -245,24 +222,5 @@ def open_else_profile(username, query, message=None):
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
-        if 'log' in request.form:
-            return redirect(url_for('app_blueprint.log', username=username))
-        if 'settle' in request.form:
-            transaction = transactions.query.get(request.form['primary_id'])
-            transaction.settled = "1"
-            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
-            transaction.date_settled = date_settled                  
-            DB.session.commit()
-        if 'comment_add' in request.form:
-            x = transactions.query.get(request.form['transaction_id'])
-            print(request.form['transaction_id'])
-            print(x)
-            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
-            DB.session.commit()
 
-
-    to_list = transactions.query.filter_by(from_user=query).all()
-    from_list = transactions.query.filter_by(to_user=query).all()
-
-    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message)
-
+    return render_template('friends.html', username=username, user=user, friend_list=url_list, message=message)
