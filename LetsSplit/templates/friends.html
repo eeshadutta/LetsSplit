@@ -19,7 +19,9 @@
         </div>
         <div class="col offset-md-6">
             <h2 class="text-center text-success">Your Friends</h><br><br> {% if friend_list != [] %}
-                <button class="btn btn-success btn-lg btn-block float-right" data-toggle="modal" data-target="#AddTransactionModal">Add Transaction</button><br><br> {% else %}
+                <button class="btn btn-success btn-lg btn-block float-right" data-toggle="modal" data-target="#AddTransactionModal">Add Transaction</button><br><br>
+                <button class="btn btn-success btn-lg btn-block float-right" data-toggle="modal" data-target="#AddGroupModal">Make New Group</button><br><br>
+                 {% else %}
                 <h5 class="text-center text-success">Its empty here. Add some friends to get started</h5>
                 {% endif %}
                 <div class="table-responsive">
@@ -77,6 +79,90 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="AddGroupModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Add a Group</h3>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <form action="{{ request.path }}"  method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input type="text" name="group_name" placeholder="Enter Group Name" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" name="usernames" placeholder="Enter Username of Person to Add" class="form-control" id="friend_username">
+                                    <button type="button" class="btn btn-sm btn-success bg-success" onclick="add_to_group();">Add To Group</button>
+                                    <input type="text" name="people_in_group" id="peeps" style="display:none;">
+                                </div>
+                            </div>
+                            <div class="alert alert-danger" id="message" style="display:none;">
+                                Not Your Friend
+                                <!--<script>
+                                    $('#AddTransactionModal').modal('show')
+                                </script>-->
+                            </div>
+                            <div class="form-group">
+                                <h3>People Added</h3>
+                                <br>
+                                <div id="friend-names" style="display:none;">
+                                    {% for friend in friend_list %}
+                                        {% if friend.username != '' %}
+                                            {{friend.username}}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <h4 id="peeps_names">
+                                </h4>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-block btn-success">
+                                    Make The Group
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+<script>
+    var x = document.getElementById('friend-names').innerHTML;
+    x = x.replace(/[^a-zA-Z\n]/g, ""); 
+    x = x.split('\n');
+    var z = 0;
+    var friend_arr = [];
+    for (var i = 0; i < x.length; i++) {
+       if (x[i] != "") {
+           friend_arr[z++] = x[i];
+        }
+    }
+    function add_to_group() {
+        var flag = 0;
+        console.log(friend_arr.length);
+        name = document.getElementById('friend_username').value;
+        for (var i = 0; i < friend_arr.length; i++)
+        {
+            if (name == friend_arr[i])
+            {
+                x = document.getElementById('peeps').value;
+                document.getElementById('peeps').value = x + name + ','; 
+                flag = 1;
+                break;
+            }  
+        }
+        if (flag == 1) {
+            document.getElementById('peeps_names').innerHTML = document.getElementById('peeps').value;
+            document.getElementById('friend_username').value = ""
+            document.getElementById('message').style.display = 'none';
+        }
+        else { 
+            document.getElementById('message').style.display = 'block';
+        }   
+    }
+</script>
 {% endblock %}
