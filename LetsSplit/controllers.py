@@ -97,13 +97,10 @@ def profile_page(username, message=None):
             print(x)
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
-<<<<<<< HEAD
-=======
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))        
->>>>>>> ca0ee176fe8c1cb0a57dc852365ced339cc9ec1b
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -166,13 +163,10 @@ def search_results(username, query, message=None):
                 message = "You can only add your own transactions"
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
-<<<<<<< HEAD
-=======
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username)) 
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
->>>>>>> ca0ee176fe8c1cb0a57dc852365ced339cc9ec1b
 
     return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_list=friend_list)
 
@@ -218,14 +212,10 @@ def log(username, message=None):
             print(x)
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
-<<<<<<< HEAD
-
-=======
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username)) 
->>>>>>> ca0ee176fe8c1cb0a57dc852365ced339cc9ec1b
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -241,8 +231,6 @@ def open_else_profile(username, query, message=None):
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('app_blueprint.sign_up'))
-<<<<<<< HEAD
-=======
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
         if 'settle' in request.form:
@@ -289,7 +277,6 @@ def friends_display(username, message=None):
             return redirect(url_for('app_blueprint.log', username=username))
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username))
->>>>>>> ca0ee176fe8c1cb0a57dc852365ced339cc9ec1b
         if 'add_transaction' in request.form:
             if request.form['from_user'] == username:
                 friend_list = []
@@ -315,29 +302,6 @@ def friends_display(username, message=None):
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
-<<<<<<< HEAD
-        if 'log' in request.form:
-            return redirect(url_for('app_blueprint.log', username=username))
-        if 'settle' in request.form:
-            transaction = transactions.query.get(request.form['primary_id'])
-            transaction.settled = "1"
-            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
-            transaction.date_settled = date_settled                  
-            DB.session.commit()
-        if 'comment_add' in request.form:
-            x = transactions.query.get(request.form['transaction_id'])
-            print(request.form['transaction_id'])
-            print(x)
-            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
-            DB.session.commit()
-
-
-    to_list = transactions.query.filter_by(from_user=query).all()
-    from_list = transactions.query.filter_by(to_user=query).all()
-
-    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message)
-
-=======
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
 
@@ -365,4 +329,3 @@ def groups_display(username):
             return redirect(url_for('app_blueprint.groups_display', username=username))
 
     return render_template('all_groups.html', username=username, user=user, group_list=group_list)            
->>>>>>> ca0ee176fe8c1cb0a57dc852365ced339cc9ec1b
