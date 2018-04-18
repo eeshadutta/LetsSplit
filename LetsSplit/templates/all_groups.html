@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block content %}
+<div class="container" style="margin-top:3vw">
+    <div class="row">
+        <div class="col-sm-6 col-md-6 col-xs-6" id="left">
+            <div class="card bg-success text-light">
+                <img src="../static/{{user.profile_pic}}" alt="Profile Picture" class="card-img-top img-thumbnail">
+                <div class="card-body">
+                    <h4 class="card-title card-header">
+                        {{user.name}}
+                    </h4>
+                    <h5 class="card-text card-body">
+                        {{user.bio}}<br><br> {{user.DOB}}
+                    </h5>
+                    <h4 class="card-title card-footer">
+                        {{user.email}}
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col offset-md-6">
+            <h3 class="text-success text-center">Your Groups</h3><br>
+            <form action="{{ request.path }}" method="post">
+                <button type="submit" name="new_group" class="btn btn-block btn-success">Make A New Group</button><br>
+            </form>
+            <div class="table-responsive text-success">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Group Name</th>
+                            <th class="text-center">Group Members</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in group_list %}
+                        <tr>
+                            <td class="text-center">{{ group.group_name }}</td>
+                            <td class="text-center">{{ group.group_members }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
