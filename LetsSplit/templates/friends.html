@@ -20,8 +20,7 @@
         <div class="col offset-md-6">
             <h2 class="text-center text-success">Your Friends</h><br><br> {% if friend_list != [] %}
                 <button class="btn btn-success btn-lg btn-block float-right" data-toggle="modal" data-target="#AddTransactionModal">Add Transaction</button><br><br>
-                <button class="btn btn-success btn-lg btn-block float-right" data-toggle="modal" data-target="#AddGroupModal">Make New Group</button><br><br>
-                 {% else %}
+                <button class="btn btn-success btn-lg btn-block float-right" data-toggle="modal" data-target="#AddGroupModal">Make New Group</button><br><br> {% else %}
                 <h5 class="text-center text-success">Its empty here. Add some friends to get started</h5>
                 {% endif %}
                 <div class="table-responsive">
@@ -87,7 +86,7 @@
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
-                    <form action="{{ request.path }}"  method="post" enctype="multipart/form-data">
+                    <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
                             <div class="form-group">
                                 <input type="text" name="group_name" placeholder="Enter Group Name" class="form-control">
@@ -96,7 +95,7 @@
                                 <div class="input-group">
                                     <input type="text" name="usernames" placeholder="Enter Username of Person to Add" class="form-control" id="friend_username">
                                     <button type="button" class="btn btn-sm btn-success bg-success" onclick="add_to_group();">Add To Group</button>
-                                    <input type="text" name="people_in_group" id="peeps" style="display:none;">
+                                    <input type="text" name="people_in_group" id="peeps" style="display:none;" value="{{ username }},">
                                 </div>
                             </div>
                             <div class="alert alert-danger" id="message" style="display:none;">
@@ -108,18 +107,16 @@
                             <div class="form-group">
                                 <h3>People Added</h3>
                                 <br>
+
                                 <div id="friend-names" style="display:none;">
-                                    {% for friend in friend_list %}
-                                        {% if friend.username != '' %}
-                                            {{friend.username}}
-                                        {% endif %}
-                                    {% endfor %}
+                                    {{username}} {% for friend in friend_list %} {% if friend.username != '' %} {{friend.username}} {% endif %} {% endfor %}
                                 </div>
                                 <h4 id="peeps_names">
+                                    {{ username }},
                                 </h4>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-block btn-success">
+                                <button name="group_submission" type="submit" class="btn btn-block btn-success">
                                     Make The Group
                                 </button>
                             </div>
@@ -132,37 +129,37 @@
 </div>
 <script>
     var x = document.getElementById('friend-names').innerHTML;
-    x = x.replace(/[^a-zA-Z\n]/g, ""); 
-    x = x.split('\n');
+    x = x.replace(/[^a-zA-Z ]/g, "");
+    x = x.split(' ');
+    console.log(x);
     var z = 0;
     var friend_arr = [];
     for (var i = 0; i < x.length; i++) {
-       if (x[i] != "") {
-           friend_arr[z++] = x[i];
+        if (x[i] != "") {
+            friend_arr[z++] = x[i];
         }
     }
+    console.log(friend_arr);
+
     function add_to_group() {
         var flag = 0;
         console.log(friend_arr.length);
         name = document.getElementById('friend_username').value;
-        for (var i = 0; i < friend_arr.length; i++)
-        {
-            if (name == friend_arr[i])
-            {
+        for (var i = 0; i < friend_arr.length; i++) {
+            if (name == friend_arr[i]) {
                 x = document.getElementById('peeps').value;
-                document.getElementById('peeps').value = x + name + ','; 
+                document.getElementById('peeps').value = x + name + ',';
                 flag = 1;
                 break;
-            }  
+            }
         }
         if (flag == 1) {
             document.getElementById('peeps_names').innerHTML = document.getElementById('peeps').value;
             document.getElementById('friend_username').value = ""
             document.getElementById('message').style.display = 'none';
-        }
-        else { 
+        } else {
             document.getElementById('message').style.display = 'block';
-        }   
+        }
     }
 </script>
 {% endblock %}

@@ -304,6 +304,13 @@ def friends_display(username, message=None):
                 message = "You can only add your own transactions"
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
+        if 'group_submission' in request.form:
+            group_name = request.form['group_name']
+            group_members = request.form['people_in_group']
+            group = groups(name=group_name, group_members=group_members)
+            DB.session.add(group)
+            DB.session.commit()
+            return redirect(url_for('app_blueprint.group_page', username=username, group_name=group_name))
 
     return render_template('friends.html', username=username, user=user, friend_list=url_list, message=message)
 
@@ -314,7 +321,10 @@ def groups_display(username):
     group_list = []
     groups_all = groups.query.all()
     for group in groups_all:
-        if username in group.group_members:
+        #print(group.group_members)
+        print(username)
+        if username in group.group_members.split(','):
+            print(group.group_members)
             group_list.append(group)
     if request.method == 'POST':    
         if 'search' in request.form:
@@ -329,3 +339,28 @@ def groups_display(username):
             return redirect(url_for('app_blueprint.groups_display', username=username))
 
     return render_template('all_groups.html', username=username, user=user, group_list=group_list)            
+
+
+@app_blueprint.route('/<username>/groups/<group_name>', methods = ['POST', 'GET'])
+def group_page(username, group_name):
+    group = groups.query.filter_by(group_name=group_name).first()
+    members_list = []
+    url_list = []
+    members_list = group.group_members.split(',')
+    for m in members_list:
+        if m != '':
+            z = users.query.filter_by(username=m).first()
+            url_list.append(z) 
+    if request.method == 'POST':    
+        if 'search' in request.form:
+            return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
+        if 'logout' in request.form:
+            return redirect(url_for('app_blueprint.sign_up'))
+        if 'log' in request.form:
+            return redirect(url_for('app_blueprint.log', username=username))
+        if 'friends' in request.form:
+            return redirect(url_for('app_blueprint.friends_display', username=username))
+        if 'groups' in request.form:
+            return redirect(url_for('app_blueprint.groups_display', username=username))
+
+    return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list)
