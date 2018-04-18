@@ -60,3 +60,25 @@ class groups(DB.Model):
     def __init__(self, name, group_members):
         self.group_name = name
         self.group_members = group_members
+
+
+class group_transactions(DB.Model):
+    id = DB.Column('user_id', DB.Integer, primary_key=True)
+    group_name = DB.Column(DB.String(50))
+    from_member = DB.Column(DB.String(50))
+    to_member = DB.Column(DB.String(50))
+    amount = DB.Column(DB.String(10))
+    settled = DB.Column(DB.String(1))
+    date_created = DB.Column(DB.String(50))
+    date_settled = DB.Column(DB.String(50))
+    comments = DB.Column(DB.String(10000))
+
+    def __init__(self, group_name, from_member, to_member, amount, settled, date_created, date_settled=''):
+        self.group_name = group_name
+        self.from_member = from_member
+        self.to_member = to_member
+        self.amount = amount
+        self.settled = settled
+        self.date_created = date_created
+        self.date_settled = date_settled
+        self.comments = ''

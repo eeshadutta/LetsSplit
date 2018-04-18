@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from werkzeug import secure_filename
 from datetime import datetime
 import os
-from models import DB, users, friends, transactions, groups
+from models import DB, users, friends, transactions, groups, group_transactions
 
 
 app_blueprint = Blueprint('app_blueprint', __name__)
@@ -341,7 +341,7 @@ def groups_display(username):
     return render_template('all_groups.html', username=username, user=user, group_list=group_list)            
 
 
-@app_blueprint.route('/<username>/groups/<group_name>', methods = ['POST', 'GET'])
+@app_blueprint.route('/<username>/groups/<group_name>', methods = ['GET', 'POST'])
 def group_page(username, group_name):
     group = groups.query.filter_by(group_name=group_name).first()
     members_list = []
@@ -351,7 +351,7 @@ def group_page(username, group_name):
         if m != '':
             z = users.query.filter_by(username=m).first()
             url_list.append(z) 
-    if request.method == 'POST':    
+    if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
@@ -362,5 +362,20 @@ def group_page(username, group_name):
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
+        if 'add_transaction' in request.form:
+            date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+            print (group_name)
+            transaction = group_transactions(group_name=group_name, from_member=request.form['from_member'], to_member=request.form['to_member'], amount=request.form['amount'], settled="0", date_created=date_created)
+            print(transaction)
+            DB.session.add(transaction)
+            DB.session.commit()
+        if 'settle' in request.form:
+            transaction = group_transactions.query.get(request.form['primary_id'])
+            transaction.settled = "1"
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
+            transaction.date_settled = date_settled                  
+            DB.session.commit()
 
-    return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list)
+    transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
+
+    return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list)
