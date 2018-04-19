@@ -321,7 +321,6 @@ def groups_display(username):
     group_list = []
     groups_all = groups.query.all()
     for group in groups_all:
-        #print(group.group_members)
         print(username)
         if username in group.group_members.split(','):
             print(group.group_members)
@@ -346,6 +345,7 @@ def group_page(username, group_name):
     group = groups.query.filter_by(group_name=group_name).first()
     members_list = []
     url_list = []
+    transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
     members_list = group.group_members.split(',')
     for m in members_list:
         if m != '':
@@ -364,9 +364,7 @@ def group_page(username, group_name):
             return redirect(url_for('app_blueprint.groups_display', username=username))
         if 'add_transaction' in request.form:
             date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
-            print (group_name)
-            transaction = group_transactions(group_name=group_name, from_member=request.form['from_member'], to_member=request.form['to_member'], amount=request.form['amount'], settled="0", date_created=date_created)
-            print(transaction)
+            transaction = group_transactions(group_name=group_name, from_member=request.form['from_user'], to_member=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
             DB.session.add(transaction)
             DB.session.commit()
         if 'settle' in request.form:
@@ -375,7 +373,26 @@ def group_page(username, group_name):
             date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
             transaction.date_settled = date_settled                  
             DB.session.commit()
+        if 'person_to_be_added' in request.form:
+            x =  friends.query.filter_by(username=username).first()
+            if request.form['person_to_be_added'] not in x.friend.split(','):
+                return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message="Not Your Friend")
+            else:
+                z = groups.query.filter_by(group_name=group_name).first()
+                z.group_members = z.group_members + request.form['person_to_be_added'] + ','
+                DB.session.commit()
+                group = groups.query.filter_by(group_name=group_name).first()
+                members_list = []
+                url_list = []
+                transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
+                members_list = group.group_members.split(',')
+                for m in members_list:
+                    if m != '':
+                        z = users.query.filter_by(username=m).first()
+                        url_list.append(z) 
+                return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=None)
 
     transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
-
-    return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list)
+    group = groups.query.filter_by(group_name=group_name).first()
+    print(group.group_members)
+    return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=None)

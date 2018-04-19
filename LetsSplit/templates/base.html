@@ -100,7 +100,7 @@
                             <input type="amount" name="amount" class="form-control" placeholder="Amount" required>
                         </div>
                     </div>
-                    {% if message and message != "Oops... No results found" %}
+                    {% if message and message != "Oops... No results found" and message != "Not Your Friend" %}
                     <div class="alert alert-danger">
                         {{ message }}
                         <script>
