@@ -93,8 +93,6 @@ def profile_page(username, message=None):
             DB.session.commit()
         if 'comment_add' in request.form:
             x = transactions.query.get(request.form['transaction_id'])
-            print(request.form['transaction_id'])
-            print(x)
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
         if 'friends' in request.form:
@@ -208,8 +206,6 @@ def log(username, message=None):
             return redirect(url_for('app_blueprint.log', username=username))
         if 'comment_add' in request.form:
             x = transactions.query.get(request.form['transaction_id'])
-            print(request.form['transaction_id'])
-            print(x)
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
         if 'friends' in request.form:
@@ -241,8 +237,6 @@ def open_else_profile(username, query, message=None):
             DB.session.commit()
         if 'comment_add' in request.form:
             x = transactions.query.get(request.form['transaction_id'])
-            print(request.form['transaction_id'])
-            print(x)
             x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
         if 'friends' in request.form:
@@ -321,9 +315,7 @@ def groups_display(username):
     group_list = []
     groups_all = groups.query.all()
     for group in groups_all:
-        print(username)
         if username in group.group_members.split(','):
-            print(group.group_members)
             group_list.append(group)
     if request.method == 'POST':    
         if 'search' in request.form:
@@ -394,5 +386,5 @@ def group_page(username, group_name):
 
     transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
     group = groups.query.filter_by(group_name=group_name).first()
-    print(group.group_members)
+
     return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=None)
