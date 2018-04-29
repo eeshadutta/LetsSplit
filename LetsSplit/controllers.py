@@ -83,6 +83,18 @@ def profile_page(username, message=None):
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
+        if 'edit_transaction' in request.form:
+            id = request.form['transaction_id']
+            transaction = transactions.query.filter_by(id=id).first()
+            transaction.from_user = request.form['from_user']
+            transaction.to_user = request.form['to_user']
+            transaction.amount = request.form['amount_user']
+            DB.session.commit()
+        if 'delete' in request.form:
+            id = request.form['del_id']
+            transaction = transactions.query.get(id)
+            DB.session.delete(transaction)
+            DB.session.commit()
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
         if 'settle' in request.form:
@@ -243,6 +255,18 @@ def open_else_profile(username, query, message=None):
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username)) 
+        if 'edit_transaction' in request.form:
+            id = request.form['transaction_id']
+            transaction = transactions.query.filter_by(id=id).first()
+            transaction.from_user = request.form['from_user']
+            transaction.to_user = request.form['to_user']
+            transaction.amount = request.form['amount_user']
+            DB.session.commit()
+        if 'delete' in request.form:
+            id = request.form['del_id']
+            transaction = transactions.query.get(id)
+            DB.session.delete(transaction)
+            DB.session.commit()
 
     to_list = transactions.query.filter_by(from_user=query).all()
     from_list = transactions.query.filter_by(to_user=query).all()
@@ -392,6 +416,19 @@ def group_page(username, group_name):
                         z = users.query.filter_by(username=m).first()
                         url_list.append(z) 
                 return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=None)
+        if 'edit_transaction' in request.form:
+            print (request.form)
+            id = request.form['transaction_id']
+            transaction = group_transactions.query.filter_by(id=id).first()
+            transaction.from_member = request.form['from_user']
+            transaction.to_member = request.form['to_user']
+            transaction.amount = request.form['amount_user']
+            DB.session.commit()
+        if 'delete' in request.form:
+            id = request.form['del_id']
+            transaction = group_transactions.query.get(id)
+            DB.session.delete(transaction)
+            DB.session.commit()
 
     transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
     group = groups.query.filter_by(group_name=group_name).first()

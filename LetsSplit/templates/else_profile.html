@@ -19,7 +19,9 @@
         </div>
         <div class="col offset-md-6">
             <div>
-                {% if total_amount
+                {% if total_amount == 0 %}
+                <h3 class="text-center text-success">Yaaay!! You're all settled</h3>
+                {% elif total_amount
                 < 0 %} <h3 class="text-center text-success">You owe {{query_user.name}} {{ -1 * total_amount }}</h3>
                     {% else %}
                     <h3 class="text-center text-success">{{ query_user.name }} owes {{ total_amount }}</h3>
@@ -47,6 +49,15 @@
                                 </form>
                             </td>
                             <td class="text-center">{{ friend.date_created }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#EditTransactionModal" onclick="assignment('{{ query_user.username }}', '{{friend.to_user}}', '{{friend.amount}}', {{ friend.id }})">Edit</button>
+                                    <form action="{{ request.path }}" method="post">
+                                        <input type="text" name="del_id" value="{{friend.id}}" style="display:none;">
+                                        <button class="btn btn-success btn-sm" name="delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="4">
@@ -71,6 +82,15 @@
                             <td class="text-center">-{{ friend.amount }}</td>]
                             <td class="text-center">You cannot settle this</td>
                             <td class="text-center">{{ friend.date_created }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#EditTransactionModal" onclick="assignment('{{ friend.from_user }}', '{{query_user.username}}', '{{friend.amount}}', {{ friend.id }})">Edit</button>
+                                    <form action="{{ request.path }}" method="post">
+                                        <input type="text" name="del_id" value="{{friend.id}}" style="display:none;">
+                                        <button class="btn btn-success btn-sm" name="delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="4">
@@ -159,6 +179,62 @@
                         {% endif %} {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="modal fade" id="EditTransactionModal">
+            <script>
+                //var from_user = document.getElementById('from');
+                //var to_user = document.getElementById('to');
+                //var amount_user = document.getElementById('amount');
+                //
+                function assignment(from, to, amount, id) {
+                    //console.log("HAHA");
+                    console.log(id);
+                    document.getElementById('from').placeholder = from;
+                    document.getElementById('to').placeholder = to;
+                    document.getElementById('amount').placeholder = amount;
+                    document.getElementById('from').value = from;
+                    document.getElementById('to').value = to;
+                    document.getElementById('amount').value = amount;
+                    document.getElementById('primary_id').value = id;
+                };
+            </script>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Edit The Transaction</h3>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                        <input type="text" name="transaction_id" style="display:none" id="primary_id">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="username">From:</label>
+                                <input type="username" name="from_user" id="from" class="form-control" placeholder="From" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">To:</label>
+                                <input type="username" name="to_user" id="to" class="form-control" placeholder="To" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount:</label>
+                                <input type="amount" name="amount_user" id="amount" class="form-control" placeholder="Amount" required>
+                            </div>
+                        </div>
+                        {% if message and message != "Oops... No results found" %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                            <script>
+                                $('#EditTransactionModal').modal('show')
+                            </script>
+                        </div>
+                        {% endif %}
+                        <div class="modal-footer">
+                            <button type="submit" name="edit_transaction" class="btn btn-success btn-block">Edit this Transaction</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
