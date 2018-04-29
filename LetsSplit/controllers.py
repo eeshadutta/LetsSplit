@@ -53,6 +53,9 @@ def sign_up(message=None):
 @app_blueprint.route('/<username>', methods=['GET', 'POST'])
 def profile_page(username, message=None):
     user = users.query.filter_by(username=username).first()
+    friend_list = []
+    x = friends.query.filter_by(username=request.form['from_user']).first()
+    friend_list = x.friend.split(',')
     if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
@@ -60,9 +63,6 @@ def profile_page(username, message=None):
             return redirect(url_for('app_blueprint.sign_up'))
         if 'add_transaction' in request.form:
             if request.form['from_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['from_user']).first()
-                friend_list = x.friend.split(',')
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
@@ -71,9 +71,6 @@ def profile_page(username, message=None):
                     DB.session.add(transaction)
                     DB.session.commit()
             elif request.form['to_user'] == username:
-                friend_list = []
-                x = friends.query.filter_by(username=request.form['to_user']).first()
-                friend_list = x.friend.split(',')
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
@@ -83,6 +80,21 @@ def profile_page(username, message=None):
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
+        if 'edit_transaction' in request.form:
+            id = request.form['transaction_id']
+            if request.form['from_user'] not in friend_list or request.form['to_user'] not in friend_list:
+                message = "Please enter correct usernames"
+                return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)                
+            transaction = transactions.query.filter_by(id=id).first()
+            transaction.from_user = request.form['from_user']
+            transaction.to_user = request.form['to_user']
+            transaction.amount = request.form['amount_user']
+            DB.session.commit()
+        if 'delete' in request.form:
+            id = request.form['del_id']
+            transaction = transactions.query.get(id)
+            DB.session.delete(transaction)
+            DB.session.commit()
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
         if 'settle' in request.form:
@@ -243,6 +255,21 @@ def open_else_profile(username, query, message=None):
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username)) 
+        if 'edit_transaction' in request.form:
+            id = request.form['transaction_id']
+            transaction = transactions.query.filter_by(id=id).first()
+            if request.form['from_user'] != username or request.form['from_user'] != query or request.form['to_user'] != username or request.form['to_user'] != query:
+                message = "Please enter the correct usernames"
+            return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)                
+            transaction.from_user = request.form['from_user']
+            transaction.to_user = request.form['to_user']
+            transaction.amount = request.form['amount_user']
+            DB.session.commit()
+        if 'delete' in request.form:
+            id = request.form['del_id']
+            transaction = transactions.query.get(id)
+            DB.session.delete(transaction)
+            DB.session.commit()
 
     to_list = transactions.query.filter_by(from_user=query).all()
     from_list = transactions.query.filter_by(to_user=query).all()
@@ -392,6 +419,22 @@ def group_page(username, group_name):
                         z = users.query.filter_by(username=m).first()
                         url_list.append(z) 
                 return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=None)
+        if 'edit_transaction' in request.form:
+            print (request.form)
+            id = request.form['transaction_id']
+            if request.form['from_user'] not in members_list or request.form['to_user'] not in members_list:
+                message = "Please Enter Correct Usernames"
+                return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=message)                
+            transaction = group_transactions.query.filter_by(id=id).first()
+            transaction.from_member = request.form['from_user']
+            transaction.to_member = request.form['to_user']
+            transaction.amount = request.form['amount_user']
+            DB.session.commit()
+        if 'delete' in request.form:
+            id = request.form['del_id']
+            transaction = group_transactions.query.get(id)
+            DB.session.delete(transaction)
+            DB.session.commit()
 
     transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
     group = groups.query.filter_by(group_name=group_name).first()
