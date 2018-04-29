@@ -63,14 +63,14 @@
                                 <input type="amount" name="amount" class="form-control" placeholder="Amount" required>
                             </div>
                         </div>
-                        {% if message and message != "Oops... No results found" %}
+                        {% if message %} {% if message.endswith('not a friend') == true %}
                         <div class="alert alert-danger">
                             {{ message }}
                             <script>
                                 $('#AddTransactionModal').modal('show')
                             </script>
                         </div>
-                        {% endif %}
+                        {% endif %}{% endif %}
                         <div class="modal-footer">
                             <button type="submit" name="add_transaction" class="btn btn-success btn-block">Add this Transaction</button>
                         </div>

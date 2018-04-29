@@ -198,7 +198,7 @@
                                 <input type="amount" name="amount_user" id="amount" class="form-control" placeholder="Amount" required>
                             </div>
                         </div>
-                        {% if message and message != "Oops... No results found" %}
+                        {% if message and message == "Please Enter Correct Usernames" %}
                         <div class="alert alert-danger">
                             {{ message }}
                             <script>
