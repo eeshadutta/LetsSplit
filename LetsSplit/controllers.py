@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from werkzeug import secure_filename
 from datetime import datetime
 import os
@@ -6,6 +6,25 @@ from models import DB, users, friends, transactions, groups, group_transactions
 
 
 app_blueprint = Blueprint('app_blueprint', __name__)
+
+def search(request):
+    search_user = request.args.get('search', None, str)
+    #print(search_user)
+    if search_user:
+        if len(search_user) > 0:
+            results = users.query.filter(users.username.startswith(search_user)).all()
+            ans_list = {}
+            if results is not None:
+                for x in results:
+                    ans_list[x.username] = []
+                    ans_list[x.username].append(x.name)
+                    ans_list[x.username].append(x.profile_pic)
+            return ans_list
+
+@app_blueprint.route('/search_people')
+def searching():
+    results = search(request)
+    return jsonify(results)
 
 
 @app_blueprint.route('/', methods = ['GET', 'POST'])
@@ -54,14 +73,18 @@ def sign_up(message=None):
 def profile_page(username, message=None):
     user = users.query.filter_by(username=username).first()
     friend_list = []
-    x = friends.query.filter_by(username=request.form['from_user']).first()
-    friend_list = x.friend.split(',')
+    #if request.method == 'GET':
+    #    #print("HAHA")
+    #    results = search(request)
+
     if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
             return redirect(url_for('app_blueprint.sign_up'))
         if 'add_transaction' in request.form:
+            x = friends.query.filter_by(username=request.form['from_user']).first()
+            friend_list = x.friend.split(',')
             if request.form['from_user'] == username:
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
@@ -74,17 +97,19 @@ def profile_page(username, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                    
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
             else:
                 message = "You can only add your own transactions"
         if 'edit_transaction' in request.form:
+            x = friends.query.filter_by(username=request.form['from_user']).first()
+            friend_list = x.friend.split(',')
             id = request.form['transaction_id']
             if request.form['from_user'] not in friend_list or request.form['to_user'] not in friend_list:
                 message = "Please enter correct usernames"
-                return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)                
+                return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
             transaction = transactions.query.filter_by(id=id).first()
             transaction.from_user = request.form['from_user']
             transaction.to_user = request.form['to_user']
@@ -100,8 +125,8 @@ def profile_page(username, message=None):
         if 'settle' in request.form:
             transaction = transactions.query.get(request.form['primary_id'])
             transaction.settled = "1"
-            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
-            transaction.date_settled = date_settled                  
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            transaction.date_settled = date_settled
             DB.session.commit()
         if 'comment_add' in request.form:
             x = transactions.query.get(request.form['transaction_id'])
@@ -110,7 +135,7 @@ def profile_page(username, message=None):
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
-            return redirect(url_for('app_blueprint.groups_display', username=username))        
+            return redirect(url_for('app_blueprint.groups_display', username=username))
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -154,7 +179,7 @@ def search_results(username, query, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False, date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
@@ -165,7 +190,7 @@ def search_results(username, query, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled=False, date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
@@ -174,7 +199,7 @@ def search_results(username, query, message=None):
         if 'log' in request.form:
             return redirect(url_for('app_blueprint.log', username=username))
         if 'friends' in request.form:
-            return redirect(url_for('app_blueprint.friends_display', username=username)) 
+            return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
 
@@ -197,7 +222,7 @@ def log(username, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
@@ -208,7 +233,7 @@ def log(username, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
@@ -223,7 +248,7 @@ def log(username, message=None):
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
-            return redirect(url_for('app_blueprint.groups_display', username=username)) 
+            return redirect(url_for('app_blueprint.groups_display', username=username))
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -244,8 +269,8 @@ def open_else_profile(username, query, message=None):
         if 'settle' in request.form:
             transaction = transactions.query.get(request.form['primary_id'])
             transaction.settled = "1"
-            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
-            transaction.date_settled = date_settled                  
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            transaction.date_settled = date_settled
             DB.session.commit()
         if 'comment_add' in request.form:
             x = transactions.query.get(request.form['transaction_id'])
@@ -254,13 +279,13 @@ def open_else_profile(username, query, message=None):
         if 'friends' in request.form:
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
-            return redirect(url_for('app_blueprint.groups_display', username=username)) 
+            return redirect(url_for('app_blueprint.groups_display', username=username))
         if 'edit_transaction' in request.form:
             id = request.form['transaction_id']
             transaction = transactions.query.filter_by(id=id).first()
             if request.form['from_user'] != username or request.form['from_user'] != query or request.form['to_user'] != username or request.form['to_user'] != query:
                 message = "Please enter the correct usernames"
-            return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)                
+            return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)
             transaction.from_user = request.form['from_user']
             transaction.to_user = request.form['to_user']
             transaction.amount = request.form['amount_user']
@@ -285,7 +310,7 @@ def open_else_profile(username, query, message=None):
 
 @app_blueprint.route('/<username>/friends', methods = ['GET', 'POST'])
 def friends_display(username, message=None):
-    user = users.query.filter_by(username=username).first() 
+    user = users.query.filter_by(username=username).first()
     x = []
     friend_list = []
     url_list = []
@@ -295,7 +320,7 @@ def friends_display(username, message=None):
         if y != '':
             z = users.query.filter_by(username=y).first()
             url_list.append(z)
-    if request.method == 'POST':    
+    if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
@@ -312,7 +337,7 @@ def friends_display(username, message=None):
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
                 else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
@@ -323,7 +348,7 @@ def friends_display(username, message=None):
                 if request.form['from_user'] not in friend_list:
                     message = request.form['from_user'] + " is not a friend"
                 else:
-                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')                                        
+                    date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     transaction = transactions(from_user=request.form['from_user'], to_user=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
                     DB.session.add(transaction)
                     DB.session.commit()
@@ -344,13 +369,13 @@ def friends_display(username, message=None):
 
 @app_blueprint.route('/<username>/groups', methods = ['GET', 'POST'])
 def groups_display(username):
-    user = users.query.filter_by(username=username).first() 
+    user = users.query.filter_by(username=username).first()
     group_list = []
     groups_all = groups.query.all()
     for group in groups_all:
         if username in group.group_members.split(','):
             group_list.append(group)
-    if request.method == 'POST':    
+    if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
@@ -362,7 +387,7 @@ def groups_display(username):
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
 
-    return render_template('all_groups.html', username=username, user=user, group_list=group_list)            
+    return render_template('all_groups.html', username=username, user=user, group_list=group_list)
 
 
 @app_blueprint.route('/<username>/groups/<group_name>', methods = ['GET', 'POST'])
@@ -375,7 +400,7 @@ def group_page(username, group_name):
     for m in members_list:
         if m != '':
             z = users.query.filter_by(username=m).first()
-            url_list.append(z) 
+            url_list.append(z)
     if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
@@ -398,8 +423,8 @@ def group_page(username, group_name):
         if 'settle' in request.form:
             transaction = group_transactions.query.get(request.form['primary_id'])
             transaction.settled = "1"
-            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
-            transaction.date_settled = date_settled                  
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            transaction.date_settled = date_settled
             DB.session.commit()
         if 'person_to_be_added' in request.form:
             x =  friends.query.filter_by(username=username).first()
@@ -417,14 +442,14 @@ def group_page(username, group_name):
                 for m in members_list:
                     if m != '':
                         z = users.query.filter_by(username=m).first()
-                        url_list.append(z) 
+                        url_list.append(z)
                 return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=None)
         if 'edit_transaction' in request.form:
             print (request.form)
             id = request.form['transaction_id']
             if request.form['from_user'] not in members_list or request.form['to_user'] not in members_list:
                 message = "Please Enter Correct Usernames"
-                return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=message)                
+                return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=message)
             transaction = group_transactions.query.filter_by(id=id).first()
             transaction.from_member = request.form['from_user']
             transaction.to_member = request.form['to_user']
