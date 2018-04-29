@@ -246,8 +246,14 @@ def open_else_profile(username, query, message=None):
 
     to_list = transactions.query.filter_by(from_user=query).all()
     from_list = transactions.query.filter_by(to_user=query).all()
-
-    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message)
+    total_amount = 0
+    for x in to_list:
+        if x.to_user == username and x.settled=="0":
+            total_amount += int(x.amount)
+    for x in from_list:
+        if x.from_user == username and x.settled=="0":
+            total_amount -= int(x.amount)
+    return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)
 
 
 @app_blueprint.route('/<username>/friends', methods = ['GET', 'POST'])
@@ -355,7 +361,10 @@ def group_page(username, group_name):
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
         if 'add_transaction' in request.form:
-            date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+            date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            if request.form['from_user'] not in members_list or request.form['to_user'] not in members_list:
+                message = "Not a group member"
+                return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=message)
             transaction = group_transactions(group_name=group_name, from_member=request.form['from_user'], to_member=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
             DB.session.add(transaction)
             DB.session.commit()
