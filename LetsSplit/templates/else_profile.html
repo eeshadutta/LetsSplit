@@ -18,9 +18,18 @@
             </div>
         </div>
         <div class="col offset-md-6">
+            <div>
+                {% if total_amount == 0 %}
+                <h3 class="text-center text-success">Yaaay!! You're all settled</h3>
+                {% elif total_amount
+                < 0 %} <h3 class="text-center text-success">You owe {{query_user.name}} {{ -1 * total_amount }}</h3>
+                    {% else %}
+                    <h3 class="text-center text-success">{{ query_user.name }} owes {{ total_amount }}</h3>
+                    {% endif %}
+            </div>
             <h3 class="text-center text-success">Your Transactions with {{ query_user.name }}</h3><br><br>
             <h4 class="text-center text-success">Unsettled Transactions</h4>
-            <div class="table-responsive">
+            <div class="table-responsive" style="color:papayawhip">
                 <table class="table table-striped text-success">
                     <thead>
                         <tr>
@@ -32,7 +41,7 @@
                     <tbody>
                         {% for friend in to_list %} {% if friend.to_user == username and friend.settled == "0" %}
                         <tr class="btn-success clickable text-success" data-toggle="collapse" data-target="#{{friend.id}}">
-                            <td class="text-center">-{{ friend.amount }}</td>
+                            <td class="text-center">{{ friend.amount }}</td>
                             <td>
                                 <form action="{{ request.path }}" method="post">
                                     <input type="text" name="primary_id" value="{{ friend.id }}" class="form-control form-control-lg" style="display:none">
@@ -40,58 +49,68 @@
                                 </form>
                             </td>
                             <td class="text-center">{{ friend.date_created }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#EditTransactionModal" onclick="assignment('{{ query_user.username }}', '{{friend.to_user}}', '{{friend.amount}}', {{ friend.id }})">Edit</button>
+                                    <form action="{{ request.path }}" method="post">
+                                        <input type="text" name="del_id" value="{{friend.id}}" style="display:none;">
+                                        <button class="btn btn-success btn-sm" name="delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="4">
                                 <div id="{{friend.id}}" class="collapse">
-                                        {%for comment in friend.comments.split(',')%}
-                                            {%if comment%}
-                                            {%set x = comment.split(' ')%}
-                                            <span class="badge badge-pill badge-success">
+                                    {%for comment in friend.comments.split(',')%} {%if comment%} {%set x = comment.split(' ')%}
+                                    <span class="badge badge-pill badge-success">
                                                     <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
-                                                </span>
-                                                <br>
-                                             {%endif%}
-                                            {%endfor%}
-                                        <form action="{{ request.path }}" method="post">
-                                            <div class="input-group">
-                                                 <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
-                                                 <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
-                                                 <button type="submit" class="btn btn-sm btn-success bf-primary">Add Comment</button>
-                                             </div>
-                                        </form>
+                                    </span>
+                                    <br> {%endif%} {%endfor%}
+                                    <form action="{{ request.path }}" method="post">
+                                        <div class="input-group">
+                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
+                                            <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
+                                            <button type="submit" class="btn btn-sm btn-success bf-primary">Add Comment</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
                         {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "0" %}
                         <tr class="clickable btn-success text-success" data-toggle="collapse" data-target="#{{friend.id}}">
-                            <td class="text-center">+{{ friend.amount }}</td>]
+                            <td class="text-center">-{{ friend.amount }}</td>]
                             <td class="text-center">You cannot settle this</td>
                             <td class="text-center">{{ friend.date_created }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#EditTransactionModal" onclick="assignment('{{ friend.from_user }}', '{{query_user.username}}', '{{friend.amount}}', {{ friend.id }})">Edit</button>
+                                    <form action="{{ request.path }}" method="post">
+                                        <input type="text" name="del_id" value="{{friend.id}}" style="display:none;">
+                                        <button class="btn btn-success btn-sm" name="delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="4">
-                                    <div id="{{friend.id}}" class="collapse">
-                                            <!-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.-->
-                                            {%for comment in friend.comments.split(',')%}
-                                            {%if comment%}
-                                            {%set x = comment.split(' ')%}
-                                            <span class="badge badge-pill badge-success">
+                                <div id="{{friend.id}}" class="collapse">
+                                    <!-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.-->
+                                    {%for comment in friend.comments.split(',')%} {%if comment%} {%set x = comment.split(' ')%}
+                                    <span class="badge badge-pill badge-success">
                                                     <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
-                                                </span>
-                                                <br>
-                                             {%endif%}
-                                            {%endfor%}
-                                           
-                                            <form action="{{ request.path }}" method="post">
-                                                <div class="input-group">
-                                                     <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
-                                                     <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
-                                                     <input type="text" name="transaction_id" style="display:none" value="{{ friend.id }}">
-                                                     <button type="submit" class="btn btn-sm btn-success bg-success" name="comment_add">Add Comment</button>
-                                                 </div>
-                                            </form>
-                                         </div>
+                                    </span>
+                                    <br> {%endif%} {%endfor%}
+
+                                    <form action="{{ request.path }}" method="post">
+                                        <div class="input-group">
+                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
+                                            <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
+                                            <input type="text" name="transaction_id" style="display:none" value="{{ friend.id }}">
+                                            <button type="submit" class="btn btn-sm btn-success bg-success" name="comment_add">Add Comment</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% endif %} {% endfor %}
@@ -111,34 +130,6 @@
                     <tbody>
                         {% for friend in to_list %} {% if friend.to_user == username and friend.settled == "1" %}
                         <tr class="clickable btn-success" data-toggle="collapse" data-target="#{{friend.id}}">
-                            <td class="text-center text-success">-{{ friend.amount }}</td>
-                            <td class="text-center text-success">{{ friend.date_created }}</td>
-                            <td class="text-center text-success">{{ friend.date_settled }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                <div id="{{friend.id}}" class="collapse">
-                                        {%for comment in friend.comments.split(',')%}
-                                            {%if comment%}
-                                            {%set x = comment.split(' ')%}
-                                            <span class="badge badge-pill badge-success">
-                                                    <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
-                                                </span>
-                                                <br>
-                                             {%endif%}
-                                            {%endfor%}
-                                        <form action="{{ request.path }}" method="post">
-                                            <div class="input-group">
-                                                 <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
-                                                 <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
-                                                 <button type="submit" class="btn btn-sm btn-success bg-success">Add Comment</button>
-                                             </div>
-                                        </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "1" %}
-                        <tr class="clickable btn-success" data-toggle="collapse" data-target="#{{friend.id}}">
                             <td class="text-center text-success">+{{ friend.amount }}</td>
                             <td class="text-center text-success">{{ friend.date_created }}</td>
                             <td class="text-center text-success">{{ friend.date_settled }}</td>
@@ -146,28 +137,104 @@
                         <tr>
                             <td colspan="4">
                                 <div id="{{friend.id}}" class="collapse">
-                                        {%for comment in friend.comments.split(',')%}
-                                        {%if comment%}
-                                        {%set x = comment.split(' ')%}
-                                        <span class="badge badge-pill badge-success">
+                                    {%for comment in friend.comments.split(',')%} {%if comment%} {%set x = comment.split(' ')%}
+                                    <span class="badge badge-pill badge-success">
+                                                    <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
+                                    </span>
+                                    <br> {%endif%} {%endfor%}
+                                    <form action="{{ request.path }}" method="post">
+                                        <div class="input-group">
+                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
+                                            <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
+                                            <button type="submit" class="btn btn-sm btn-success bg-success">Add Comment</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %} {% endfor %} {% for friend in from_list %} {% if friend.from_user == username and friend.settled == "1" %}
+                        <tr class="clickable btn-success" data-toggle="collapse" data-target="#{{friend.id}}">
+                            <td class="text-center text-success">-{{ friend.amount }}</td>
+                            <td class="text-center text-success">{{ friend.date_created }}</td>
+                            <td class="text-center text-success">{{ friend.date_settled }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div id="{{friend.id}}" class="collapse">
+                                    {%for comment in friend.comments.split(',')%} {%if comment%} {%set x = comment.split(' ')%}
+                                    <span class="badge badge-pill badge-success">
                                                 <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
-                                            </span>
-                                            <br>
-                                         {%endif%}
-                                        {%endfor%}
-                                        <form action="{{ request.path }}" method="post">
-                                            <div class="input-group">
-                                                 <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
-                                                 <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
-                                                 <button type="submit" class="btn btn-sm btn-success bg-success">Add Comment</button>
-                                             </div>
-                                        </form>
+                                    </span>
+                                    <br> {%endif%} {%endfor%}
+                                    <form action="{{ request.path }}" method="post">
+                                        <div class="input-group">
+                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
+                                            <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
+                                            <button type="submit" class="btn btn-sm btn-success bg-success">Add Comment</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
                         {% endif %} {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="modal fade" id="EditTransactionModal">
+            <script>
+                //var from_user = document.getElementById('from');
+                //var to_user = document.getElementById('to');
+                //var amount_user = document.getElementById('amount');
+                //
+                function assignment(from, to, amount, id) {
+                    //console.log("HAHA");
+                    console.log(id);
+                    document.getElementById('from').placeholder = from;
+                    document.getElementById('to').placeholder = to;
+                    document.getElementById('amount').placeholder = amount;
+                    document.getElementById('from').value = from;
+                    document.getElementById('to').value = to;
+                    document.getElementById('amount').value = amount;
+                    document.getElementById('primary_id').value = id;
+                };
+            </script>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Edit The Transaction</h3>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                        <input type="text" name="transaction_id" style="display:none" id="primary_id">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="username">From:</label>
+                                <input type="username" name="from_user" id="from" class="form-control" placeholder="From" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">To:</label>
+                                <input type="username" name="to_user" id="to" class="form-control" placeholder="To" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount:</label>
+                                <input type="amount" name="amount_user" id="amount" class="form-control" placeholder="Amount" required>
+                            </div>
+                        </div>
+                        {% if message and message == "Please enter the correct usernames" %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                            <script>
+                                $('#EditTransactionModal').modal('show')
+                            </script>
+                        </div>
+                        {% endif %}
+                        <div class="modal-footer">
+                            <button type="submit" name="edit_transaction" class="btn btn-success btn-block">Edit this Transaction</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@
             font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
             font-size: 250%;
         }
-        
+
         @media screen and (min-width: 768px) {
             #left {
                 position: fixed;
@@ -25,6 +25,33 @@
             }
         }
     </style>
+    <script type=text/javascript>
+      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    <script type="text/javascript">
+      $(function(){
+        $('#search_bar').bind('keyup', function(){
+          $.getJSON($SCRIPT_ROOT + '/search_people', {
+            search : $('input[name="search_name"]').val()
+          }, function(data){
+            console.log(Object.keys(data))
+            //console.log(data.length)
+            var s = []
+            document.getElementById('results').innerHTML = ""
+            for (var x = 0; x < Object.keys(data).length; x++)
+            {
+              //console.log(Object.keys(data)[x]);
+              document.getElementById('results').innerHTML = document.getElementById("results").innerHTML + "<a class='dropdown-item btn-success text-success' style='font-size:1.5vw;' href='{{ username }}" + "/search/" + Object.keys(data)[x] + "/profile'>" +  Object.keys(data)[x] + "</a>";
+              //document.getElementsByClassName('dropdown-menu').innerHTML = document.getElementsByClassName('dropdown-menu').innerHTML + "<a class='dropdown-item'>" +  data[Object.keys(data)[x][0]] + "</a>";
+            };
+            console.log(document.getElementById('results').innerHTML);
+            $('#results').style.display = 'block';
+          });
+          return false;
+        });
+      });
+    </script>
+
 </head>
 
 <body style="background-color:papayawhip">
@@ -46,6 +73,13 @@
                     <form action="{{ request.path }}" method="post" class="ml-auto">
                         <li class="nav-item">
                             <div class="form-group">
+                                <button type="submit" name="groups" class="btn btn-success btn-lg btn-block">Groups</button>
+                            </div>
+                        </li>
+                    </form>
+                    <form action="{{ request.path }}" method="post" class="ml-auto">
+                        <li class="nav-item">
+                            <div class="form-group">
                                 <button type="submit" name="log" class="btn btn-success btn-lg btn-block">History</button>
                             </div>
                         </li>
@@ -55,7 +89,7 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
                             <div class="form-group">
-                                <input type="text" name="search_name" class="form-control form-control-lg" placeholder="Search.....">
+                                <input type="text" name="search_name" class="form-control form-control-lg" placeholder="Search....." id="search_bar">
                             </div>
                         </li>
                         <li class="nav-item">
@@ -73,7 +107,10 @@
             </div>
         </div>
     </nav>
-    <div class="modal fade" id="AddTransactionModal">
+    <div id="results" style="display:hidden;" class="text-center text-white">
+
+    </div>
+    <!--<div class="modal fade" id="AddTransactionModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -93,7 +130,7 @@
                             <input type="amount" name="amount" class="form-control" placeholder="Amount" required>
                         </div>
                     </div>
-                    {% if message and message != "Oops... No results found" %}
+                    {% if message and message != "Oops... No results found" and message != "Not Your Friend" %}
                     <div class="alert alert-danger">
                         {{ message }}
                         <script>
@@ -107,7 +144,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div>-->
 
     {% block content %}{% endblock %}
 </body>
