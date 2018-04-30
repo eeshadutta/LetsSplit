@@ -267,6 +267,9 @@ def log(username, message=None):
 @app_blueprint.route('/<username>/search/<query>/profile', methods = ['GET', 'POST'])
 def open_else_profile(username, query, message=None):
     query_user = users.query.filter_by(username=query).first()
+    to_list = transactions.query.filter_by(from_user=query).all()
+    from_list = transactions.query.filter_by(to_user=query).all()
+    total_amount = 0
     if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
@@ -291,13 +294,21 @@ def open_else_profile(username, query, message=None):
         if 'edit_transaction' in request.form:
             id = request.form['transaction_id']
             transaction = transactions.query.filter_by(id=id).first()
-            if request.form['from_user'] != username or request.form['from_user'] != query or request.form['to_user'] != username or request.form['to_user'] != query:
+            if request.form['from_user'] == username:
+                if request.form['to_user'] == query:
+                    transaction.from_user = request.form['from_user']
+                    transaction.to_user = request.form['to_user']
+                    transaction.amount = request.form['amount_user']
+                    DB.session.commit()
+            elif request.form['to_user'] == username:
+                if request.form['from_user'] == query:
+                    transaction.from_user = request.form['from_user']
+                    transaction.to_user = request.form['to_user']
+                    transaction.amount = request.form['amount_user']
+                    DB.session.commit()
+            else:
                 message = "Please enter the correct usernames"
-            return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)
-            transaction.from_user = request.form['from_user']
-            transaction.to_user = request.form['to_user']
-            transaction.amount = request.form['amount_user']
-            DB.session.commit()
+                return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)                
         if 'delete' in request.form:
             id = request.form['del_id']
             transaction = transactions.query.get(id)
