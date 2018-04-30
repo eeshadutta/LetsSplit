@@ -61,7 +61,7 @@ def sign_up(message=None):
                     message = "Incorrect Username"
                 elif request.form['password'] is None:
                     message = 'Please Enter Password'
-                elif str(x.password) == str(request.form['password']) and x is not None:
+                elif x.check_password(str(request.form['password'])) == True and x is not None:
                     return redirect(url_for('app_blueprint.profile_page', username=request.form['username']))
                 elif str(x.password) != str(request.form['password']):
                     message = "Incorrect Password"
