@@ -402,6 +402,7 @@ def group_page(username, group_name):
             z = users.query.filter_by(username=m).first()
             url_list.append(z)
     if request.method == 'POST':
+        print(request.form)
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:

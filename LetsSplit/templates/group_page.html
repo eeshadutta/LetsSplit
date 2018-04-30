@@ -16,7 +16,7 @@
                                 </a>
                             </td>
                             <td class="text-center text-success">
-                                <h3>{{ member.username }}</h3>
+                                <h3 class="group_all_members">{{ member.username }}</h3>
                             </td>
                         </tr>
                         {% endif %} {% endfor %}
@@ -124,36 +124,153 @@
         </div>
         <div class="modal fade" id="AddTransactionModal">
             <div class="modal-dialog">
+
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title">Add a Transaction</h3>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
+                    <div class="modal-footer btn-group">
+                      <button class="btn btn-success btn-block" data-target="#UnequalSplit" data-toggle="collapse">Individual Transaction</button>
+                      <button class="btn btn-success" data-target="#EqualSplit" data-toggle="collapse">Equal Split</button>
+                    </div>
 
-                    <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <input type="username" name="from_member" class="form-control" placeholder="From" required>
+                    <div class="collapse" id="UnequalSplit">
+                        <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <input type="username" name="from_member" class="form-control" placeholder="From" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="username" name="to_member" class="form-control" placeholder="To" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="amount" name="amount" class="form-control" placeholder="Amount" required>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <input type="username" name="to_member" class="form-control" placeholder="To" required>
+                            {% if message and message == "Not a group member" %}
+                            <div class="alert alert-danger">
+                                {{ message }}
+                                <script>
+                                    $('#AddTransactionModal').modal('show')
+                                </script>
                             </div>
-                            <div class="form-group">
-                                <input type="amount" name="amount" class="form-control" placeholder="Amount" required>
+                            {% endif %}
+                            <div class="modal-footer">
+                                <button type="submit" name="add_transaction" class="btn btn-success btn-block">Add this Transaction</button>
                             </div>
-                        </div>
-                        {% if message and message == "Not a group member" %}
-                        <div class="alert alert-danger">
-                            {{ message }}
-                            <script>
-                                $('#AddTransactionModal').modal('show')
-                            </script>
-                        </div>
-                        {% endif %}
-                        <div class="modal-footer">
-                            <button type="submit" name="add_transaction" class="btn btn-success btn-block">Add this Transaction</button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+                    <div class="collapse" id="EqualSplit">
+                        <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <input type="username" name="num_members_total" class="form-control" placeholder="Total People" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="username" name="total_amount" class="form-control" placeholder="Total Amount" required>
+                                </div>
+                                <div class="form-group form-inline">
+                                    <input type="amount" id="peeps_members" name="peeps" class="form-control" placeholder="Members" required>
+                                    <button class="btn btn-success" onclick="Add_Person_to_Members();" type="button">Add Person</button>
+
+                                </div>
+                                <div class="form-group">
+                                    <h3 id="peeps_members_paying">
+
+                                    </h3>
+                                    <input type="text" name="all_members" id="all_members" style="display:none;">
+                                </div>
+                                <!--<div class="form-group">
+                                    <input type="amount" name="num_paying" class="form-control" placeholder="Number of people paying" required>
+                                </div>-->
+                                <div class="form-group form-inline">
+                                    <input type="text" id='peeps_paying_add' class="form-control" placeholder="People Paying" required>
+                                    <button class="btn btn-success" onclick="Add_Person_to_People_Paying();" type="button">Add Person</button>
+                                </div>
+                                <div class="form-group">
+                                    <h3 id="peeps_paying">
+
+                                    </h3>
+                                    <input type="text" id="members_paying" name="members_paying" style="display:none;">
+                                </div>
+                                <div class="alert alert-danger text-danger" id="wrong_person" style="display:none;">
+
+                                </div>
+
+                            </div>
+                            {% if message and message == "Not a group member" %}
+                            <div class="alert alert-danger">
+                                {{ message }}
+                                <script>
+                                    $('#AddTransactionModal').modal('show')
+                                </script>
+                            </div>
+                            {% endif %}
+                            <div class="modal-footer">
+                                <button type="submit" name="add_equal_transaction" class="btn btn-success btn-block">Add this Transaction</button>
+                            </div>
+                        </form>
+                        <script>
+                            function Add_Person_to_People_Paying() {
+                                //console.log('HAHA');
+                                var x = document.getElementById('peeps_paying_add').value;
+                                //console.log(x);
+                                var flag = 0;
+                                m = document.getElementsByClassName('group_all_members');
+                                //console.log(document.getElementsByClassName('group_all_members'));
+                                for (var y = 0; y < m.length; y++) {
+                                    var x = document.getElementById('peeps_paying_add').value;
+                                    console.log(m[y].innerHTML);
+                                    console.log(x);
+                                    if (m[y].innerHTML == x) {
+                                        flag = 1;
+                                        //console.log(flag);
+                                        break;
+                                    };
+                                    //console.log(flag);
+                                };
+                                console.log(flag);
+                                if (flag == 0) {
+                                    console.log('haha');
+                                    document.getElementById('wrong_person').innerHTML = "This Person is Not a Member of the group";
+                                    document.getElementById('wrong_person').style.display = 'block';
+                                } else {
+                                    var x = document.getElementById('peeps_paying_add').value;
+                                    document.getElementById('wrong_person').style.display = 'none';
+                                    document.getElementById('peeps_paying').innerHTML = document.getElementById('peeps_paying').innerHTML + x + ',';
+                                    document.getElementById('members_paying').value = document.getElementById('peeps_paying').innerHTML;
+                                };
+                            };
+
+                            function Add_Person_to_Members() {
+                              var x = document.getElementById('peeps_members').value;
+                              var flag = 0;
+                              m = document.getElementsByClassName('group_all_members');
+                              //console.log(document.getElementsByClassName('group_all_members'));
+                              for (var y = 0; y < m.length; y++) {
+                                  var x = document.getElementById('peeps_members').value;
+                                  console.log(m[y].innerHTML);
+                                  console.log(x);
+                                  if (m[y].innerHTML == x) {
+                                      flag = 1;
+                                      //console.log(flag);
+                                      break;
+                                  };
+                                  //console.log(flag);
+                              };
+                              if (flag == 0) {
+                                document.getElementById('wrong_person').innerHTML = "This Person is Not a Member of the group";
+                                document.getElementById('wrong_person').style.display = 'block';
+                              } else {
+                                var x = document.getElementById('peeps_members').value;
+                                document.getElementById('wrong_person').style.display = 'none';
+                                document.getElementById('peeps_members_paying').innerHTML = document.getElementById('peeps_members_paying').innerHTML + x + ',';
+                                document.getElementById('all_members').value = document.getElementById('peeps_members_paying').innerHTML;
+                              };
+                            };
+                        </script>
+                    </div>
                 </div>
             </div>
         </div>
