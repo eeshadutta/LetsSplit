@@ -440,6 +440,10 @@ def group_page(username, group_name):
                         transaction = group_transactions(group_name=group_name, from_member=payee, to_member=receiver, amount=each_pays, settled="0", date_created=date_created)
                         DB.session.add(transaction)
                         DB.session.commit()
+        if 'comment_add' in request.form:
+            x = group_transactions.query.get(request.form['transaction_id'])
+            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
+            DB.session.commit()
         if 'settle' in request.form:
             transaction = group_transactions.query.get(request.form['primary_id'])
             transaction.settled = "1"
