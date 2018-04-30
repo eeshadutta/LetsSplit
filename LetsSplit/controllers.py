@@ -85,8 +85,6 @@ def profile_page(username, message=None):
         if 'logout' in request.form:
             return redirect(url_for('app_blueprint.sign_up'))
         if 'add_transaction' in request.form:
-            x = friends.query.filter_by(username=request.form['from_user']).first()
-            friend_list = x.friend.split(',')
             if request.form['from_user'] == username:
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
@@ -106,13 +104,21 @@ def profile_page(username, message=None):
             else:
                 message = "You can only add your own transactions"
         if 'edit_transaction' in request.form:
-            x = friends.query.filter_by(username=request.form['from_user']).first()
+            x = friends.query.filter_by(username=username).first()
             friend_list = x.friend.split(',')
             id = request.form['transaction_id']
-            if request.form['from_user'] not in friend_list or request.form['to_user'] not in friend_list:
-                message = "Please enter correct usernames"
+            if request.form['from_user'] != username and request.form['to_user'] != username:
+                message = "Please enter the correct usernames"
                 return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
-            transaction = transactions.query.filter_by(id=id).first()
+            if request.form['from_user'] == username:
+                if request.form['to_user'] not in friend_list:
+                    message = "Please enter the correct usernames"
+                    return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
+            if request.form['to_user'] == username:
+                if request.form['from_user'] not in friend_list:
+                    message = "Please enter the correct usernames"
+                    return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
+            transaction = transactions.query.get(id)
             transaction.from_user = request.form['from_user']
             transaction.to_user = request.form['to_user']
             transaction.amount = request.form['amount_user']
