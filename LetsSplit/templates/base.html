@@ -41,7 +41,7 @@
             for (var x = 0; x < Object.keys(data).length; x++)
             {
               //console.log(Object.keys(data)[x]);
-              document.getElementById('results').innerHTML = document.getElementById("results").innerHTML + "<a class='dropdown-item btn-success text-success' style='font-size:1.5vw;' href='{{ username }}" + "/search/" + Object.keys(data)[x] + "/profile'>" +  Object.keys(data)[x] + "</a>";
+              document.getElementById('results').innerHTML = document.getElementById("results").innerHTML + "<a class='dropdown-item btn-success text-success' style='font-size:1.5vw;' href='../../{{ username }}" + "/search/" + Object.keys(data)[x] + "/profile'>" +  Object.keys(data)[x] + "</a>";
               //document.getElementsByClassName('dropdown-menu').innerHTML = document.getElementsByClassName('dropdown-menu').innerHTML + "<a class='dropdown-item'>" +  data[Object.keys(data)[x][0]] + "</a>";
             };
             console.log(document.getElementById('results').innerHTML);
