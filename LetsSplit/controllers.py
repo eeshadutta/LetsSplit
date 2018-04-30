@@ -402,7 +402,6 @@ def group_page(username, group_name):
             z = users.query.filter_by(username=m).first()
             url_list.append(z)
     if request.method == 'POST':
-        print(request.form)
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
@@ -421,6 +420,26 @@ def group_page(username, group_name):
             transaction = group_transactions(group_name=group_name, from_member=request.form['from_user'], to_member=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
             DB.session.add(transaction)
             DB.session.commit()
+        if 'add_equal_transaction' in request.form:
+            members_receiving = []
+            members_paying = []
+            total_people = int(request.form['num_members_total'])
+            total_amount = int(request.form['total_amount'])
+            members_receiving = request.form['members_receiving'].split(',')
+            members_paying = request.form['members_paying'].split(',')
+            members_receiving[0] = members_receiving[0].strip()
+            members_paying[0] = members_paying[0].strip()
+            num_receiving = len(members_receiving) - 1
+            num_paying = len(members_paying) - 1
+            each_recieves = (total_amount/num_receiving) - (total_amount/total_people)
+            each_pays = each_recieves/num_paying
+            date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')            
+            for receiver in members_receiving:
+                for payee in members_paying:
+                    if receiver != '' and payee != '':
+                        transaction = group_transactions(group_name=group_name, from_member=payee, to_member=receiver, amount=each_pays, settled="0", date_created=date_created)
+                        DB.session.add(transaction)
+                        DB.session.commit()
         if 'settle' in request.form:
             transaction = group_transactions.query.get(request.form['primary_id'])
             transaction.settled = "1"
