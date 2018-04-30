@@ -76,6 +76,8 @@ def profile_page(username, message=None):
     #if request.method == 'GET':
     #    #print("HAHA")
     #    results = search(request)
+    to_list = transactions.query.filter_by(from_user=username).all()
+    from_list = transactions.query.filter_by(to_user=username).all()
 
     if request.method == 'POST':
         if 'search' in request.form:
