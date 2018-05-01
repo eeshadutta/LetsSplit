@@ -32,12 +32,16 @@ Pre-requisites
 
  2. Flask
 	 `pip3 install flask`
+
 	 `pip3 install flask_sqlalchemy`
 
  3. A Little Money
 
 
 To Run
-
-    `cd LetsSplit/LetSplit`
-    `python3 LetsSplit.py`
+ `git clone "https://gitlab.com/manan.goel/LetsSplit"`
+ 
+ `cd LetsSplit/LetsSplit`
+ 
+ `python3 LetsSplit.py`
+ 
