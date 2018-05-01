@@ -28,6 +28,7 @@
                             <th class="text-center">Amount</th>
                             <th class="text-center">Settle</th>
                             <th class="text-center">Created On</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,7 +63,7 @@
                                     <span class="badge badge-pill badge-success">
                                             <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
                                     </span>
-                                    <br> {%endif%} {%endfor%}
+                                    <br><br> {%endif%} {%endfor%}
 
                                     <form action="{{ request.path }}" method="post">
                                         <div class="input-group">
@@ -111,7 +112,7 @@
                                     <span class="badge badge-pill badge-success">
                                                      <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
                                     </span>
-                                    <br> {%endif%} {%endfor%}
+                                    <br><br> {%endif%} {%endfor%}
 
                                     <form action="{{ request.path }}" method="post">
                                         <div class="input-group">

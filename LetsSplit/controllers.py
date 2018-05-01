@@ -7,23 +7,27 @@ from models import DB, users, friends, transactions, groups, group_transactions
 
 app_blueprint = Blueprint('app_blueprint', __name__)
 
-def search(request):
+def search(username, request):
     search_user = request.args.get('search', None, str)
-    #print(search_user)
+    user = friends.query.filter_by(username=username).first()
+    print(user.friend)
     if search_user:
         if len(search_user) > 0:
             results = users.query.filter(users.username.startswith(search_user)).all()
             ans_list = {}
+            user_friend_list = user.friend.split(',')
+
             if results is not None:
                 for x in results:
-                    ans_list[x.username] = []
-                    ans_list[x.username].append(x.name)
-                    ans_list[x.username].append(x.profile_pic)
+                    if x.username in user_friend_list:
+                        ans_list[x.username] = []
+                        ans_list[x.username].append(x.name)
+                        ans_list[x.username].append(x.profile_pic)
             return ans_list
 
-@app_blueprint.route('/search_people')
-def searching():
-    results = search(request)
+@app_blueprint.route('/<username>/search_people')
+def searching(username):
+    results = search(username, request)
     return jsonify(results)
 
 
@@ -61,9 +65,9 @@ def sign_up(message=None):
                     message = "Incorrect Username"
                 elif request.form['password'] is None:
                     message = 'Please Enter Password'
-                elif str(x.password) == str(request.form['password']) and x is not None:
+                elif x.check_password(str(request.form['password'])) == True and x is not None:
                     return redirect(url_for('app_blueprint.profile_page', username=request.form['username']))
-                elif str(x.password) != str(request.form['password']):
+                elif x.check_password(str(request.form['password'])) == False:
                     message = "Incorrect Password"
 
     return render_template('home.html', message=message)
@@ -76,6 +80,8 @@ def profile_page(username, message=None):
     #if request.method == 'GET':
     #    #print("HAHA")
     #    results = search(request)
+    to_list = transactions.query.filter_by(from_user=username).all()
+    from_list = transactions.query.filter_by(to_user=username).all()
 
     if request.method == 'POST':
         if 'search' in request.form:
@@ -83,8 +89,6 @@ def profile_page(username, message=None):
         if 'logout' in request.form:
             return redirect(url_for('app_blueprint.sign_up'))
         if 'add_transaction' in request.form:
-            x = friends.query.filter_by(username=request.form['from_user']).first()
-            friend_list = x.friend.split(',')
             if request.form['from_user'] == username:
                 if request.form['to_user'] not in friend_list:
                     message = request.form['to_user'] + " is not a friend"
@@ -104,13 +108,21 @@ def profile_page(username, message=None):
             else:
                 message = "You can only add your own transactions"
         if 'edit_transaction' in request.form:
-            x = friends.query.filter_by(username=request.form['from_user']).first()
+            x = friends.query.filter_by(username=username).first()
             friend_list = x.friend.split(',')
             id = request.form['transaction_id']
-            if request.form['from_user'] not in friend_list or request.form['to_user'] not in friend_list:
-                message = "Please enter correct usernames"
+            if request.form['from_user'] != username and request.form['to_user'] != username:
+                message = "Please enter the correct usernames"
                 return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
-            transaction = transactions.query.filter_by(id=id).first()
+            if request.form['from_user'] == username:
+                if request.form['to_user'] not in friend_list:
+                    message = "Please enter the correct usernames"
+                    return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
+            if request.form['to_user'] == username:
+                if request.form['from_user'] not in friend_list:
+                    message = "Please enter the correct usernames"
+                    return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list)
+            transaction = transactions.query.get(id)
             transaction.from_user = request.form['from_user']
             transaction.to_user = request.form['to_user']
             transaction.amount = request.form['amount_user']
@@ -259,6 +271,9 @@ def log(username, message=None):
 @app_blueprint.route('/<username>/search/<query>/profile', methods = ['GET', 'POST'])
 def open_else_profile(username, query, message=None):
     query_user = users.query.filter_by(username=query).first()
+    to_list = transactions.query.filter_by(from_user=query).all()
+    from_list = transactions.query.filter_by(to_user=query).all()
+    total_amount = 0
     if request.method == 'POST':
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
@@ -283,13 +298,21 @@ def open_else_profile(username, query, message=None):
         if 'edit_transaction' in request.form:
             id = request.form['transaction_id']
             transaction = transactions.query.filter_by(id=id).first()
-            if request.form['from_user'] != username or request.form['from_user'] != query or request.form['to_user'] != username or request.form['to_user'] != query:
+            if request.form['from_user'] == username:
+                if request.form['to_user'] == query:
+                    transaction.from_user = request.form['from_user']
+                    transaction.to_user = request.form['to_user']
+                    transaction.amount = request.form['amount_user']
+                    DB.session.commit()
+            elif request.form['to_user'] == username:
+                if request.form['from_user'] == query:
+                    transaction.from_user = request.form['from_user']
+                    transaction.to_user = request.form['to_user']
+                    transaction.amount = request.form['amount_user']
+                    DB.session.commit()
+            else:
                 message = "Please enter the correct usernames"
-            return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)
-            transaction.from_user = request.form['from_user']
-            transaction.to_user = request.form['to_user']
-            transaction.amount = request.form['amount_user']
-            DB.session.commit()
+                return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)
         if 'delete' in request.form:
             id = request.form['del_id']
             transaction = transactions.query.get(id)
@@ -402,7 +425,6 @@ def group_page(username, group_name):
             z = users.query.filter_by(username=m).first()
             url_list.append(z)
     if request.method == 'POST':
-        print(request.form)
         if 'search' in request.form:
             return redirect(url_for('app_blueprint.search_results', username=username, query=request.form['search_name']))
         if 'logout' in request.form:
@@ -420,6 +442,30 @@ def group_page(username, group_name):
                 return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=message)
             transaction = group_transactions(group_name=group_name, from_member=request.form['from_user'], to_member=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
             DB.session.add(transaction)
+            DB.session.commit()
+        if 'add_equal_transaction' in request.form:
+            members_receiving = []
+            members_paying = []
+            total_people = int(request.form['num_members_total'])
+            total_amount = int(request.form['total_amount'])
+            members_receiving = request.form['members_receiving'].split(',')
+            members_paying = request.form['members_paying'].split(',')
+            members_receiving[0] = members_receiving[0].strip()
+            members_paying[0] = members_paying[0].strip()
+            num_receiving = len(members_receiving) - 1
+            num_paying = len(members_paying) - 1
+            each_recieves = (total_amount/num_receiving) - (total_amount/total_people)
+            each_pays = each_recieves/num_paying
+            date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            for receiver in members_receiving:
+                for payee in members_paying:
+                    if receiver != '' and payee != '':
+                        transaction = group_transactions(group_name=group_name, from_member=payee, to_member=receiver, amount=each_pays, settled="0", date_created=date_created)
+                        DB.session.add(transaction)
+                        DB.session.commit()
+        if 'comment_add' in request.form:
+            x = group_transactions.query.get(request.form['transaction_id'])
+            x.comments = x.comments + ',' + request.form['submitting_user'] + ' ' + request.form['comment']
             DB.session.commit()
         if 'settle' in request.form:
             transaction = group_transactions.query.get(request.form['primary_id'])

@@ -1,6 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 DB = SQLAlchemy()
+
 
 class users(DB.Model):
     __searchable__ = ['name']
@@ -16,11 +19,18 @@ class users(DB.Model):
     def __init__(self, email, username, password, DOB ,profile_pic_url, name, bio):
         self.email = email
         self.username = username
-        self.password = password
+        self.hash_password(password)
         self.DOB = DOB
         self.profile_pic = profile_pic_url
         self.name = name
         self.bio = bio
+
+    def hash_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self,password):
+        return check_password_hash(self.password, password)
+
 
 class friends(DB.Model):
     id = DB.Column('user_id', DB.Integer, primary_key = True)
