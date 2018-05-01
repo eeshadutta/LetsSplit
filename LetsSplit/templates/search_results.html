@@ -40,15 +40,15 @@
                 <div class="card-footer">
                     {% if friend_status[user.username] == "Friend" %}
                     <div class="card-text card-footer text-center">
-                        Friends <span class="bg-success"><i class="fa fa-success"></i></span>
+                        Friends <span class="bg-success"><i class="fa fa-check"></i></span>
                     </div>
                     {% elif friend_status[user.username] == "Friend Request sent to me" %}
 
                     <form action="{{request.path}}" method="post">
-                        <div class="btn-group">
+                        <div class="btn-group card-footer">
                             <input type="text" value="{{user.username}}" style="display:none;" name="person">
-                            <button type="submit" class="btn btn-success btn-lg btn-block" name="friend_request_accept">Accept</button>
-                            <button type="submit" class="btn btn-success btn-lg btn-block" name="friend_request_delete">Delete</button>
+                            <button type="submit" class="btn btn-success" name="friend_request_accept">Accept</button>
+                            <button type="submit" class="btn btn-success btn-block" name="friend_request_delete">Delete</button>
                         </div>
                     </form>
 

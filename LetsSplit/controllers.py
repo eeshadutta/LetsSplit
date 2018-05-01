@@ -32,6 +32,41 @@ def friend_request_search(username):
     return friend_request_list
 
 
+def accept_friend_request(username, request):
+    fr1 = friends.query.filter_by(username=username).first()  
+    friend_status = {}  
+    friend_request = friend_requests.query.filter_by(from_user=request.form['person']).filter_by(to_user=username).first()
+    DB.session.delete(friend_request)
+    fr2 = friends.query.filter_by(username=request.form['person']).first()
+    a = fr2.friend
+    z = fr1.friend
+    fr1.friend = z + request.form['person'] + ','
+    fr2.friend = a + username + ','
+    friend_list = fr1.friend.split(',')
+    #friend_list = friend_list + request.form['person'] + ','
+    DB.session.commit()
+    friend_requests_from_username = friend_requests.query.filter_by(from_user=username).all()
+    friend_requests_to_username = friend_requests.query.filter_by(to_user=username).all()
+    for x in friend_requests_from_username:
+        friend_status[x.to_user] = "Friend Request sent by me"
+    for x in friend_requests_to_username:
+        friend_status[x.from_user] = "Friend Request sent to me"
+    for x in friend_list:
+        friend_status[x] = "Friend"
+    return friend_status
+        #print(friend_status)
+        #print(friend_list)
+        #print(friend_status)
+        #return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_status=friend_status, friend_requests_list=friend_request_search(username))
+
+
+def delete_friend_request(username, request):
+    friend_request = friend_requests.query.filter_by(from_user=request.form['person']).filter_by(to_user=username).first()
+    DB.session.delete(friend_request)
+    DB.session.commit()
+    return
+
+
 @app_blueprint.route('/<username>/search_people')
 def searching(username):
     #print("HAHA")
@@ -156,6 +191,13 @@ def profile_page(username, message=None):
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
+        if "friend_request_accept" in request.form:
+            friend_status = accept_friend_request(username, request)
+            to_list = transactions.query.filter_by(from_user=username).all()
+            from_list = transactions.query.filter_by(to_user=username).all()
+            return render_template('profile_page.html', username=username, user=user, message=message, to_list=to_list, from_list=from_list, friend_requests_list=friend_request_search(username))            
+        if 'friend_request_delete' in request.form:
+            delete_friend_request(username, request)
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -205,32 +247,10 @@ def search_results(username, query, message=None):
             for x in friend_list:
                 friend_status[x] = "Friend"
         if "friend_request_accept" in request.form:
-            friend_request = friend_requests.query.filter_by(from_user=request.form['person']).filter_by(to_user=username).first()
-            DB.session.delete(friend_request)
-            fr2 = friends.query.filter_by(username=request.form['person']).first()
-            a = fr2.friend
-            z = fr1.friend
-            fr1.friend = z + request.form['person'] + ','
-            fr2.friend = a + username + ','
-            friend_list = fr1.friend.split(',')
-            #friend_list = friend_list + request.form['person'] + ','
-            DB.session.commit()
-            friend_requests_from_username = friend_requests.query.filter_by(from_user=username).all()
-            friend_requests_to_username = friend_requests.query.filter_by(to_user=username).all()
-            for x in friend_requests_from_username:
-                friend_status[x.to_user] = "Friend Request sent by me"
-            for x in friend_requests_to_username:
-                friend_status[x.from_user] = "Friend Request sent to me"
-            for x in friend_list:
-                friend_status[x] = "Friend"
-            #print(friend_status)
-            #print(friend_list)
-            #print(friend_status)
+            friend_status = accept_friend_request(username, request)
             return render_template('search_results.html', username=username, results=results, message=message, profile_pic_dict=url_dict, friend_status=friend_status, friend_requests_list=friend_request_search(username))
         if 'friend_request_delete' in request.form:
-            friend_request = friend_requests.query.filter_by(from_user=request.form['person']).filter_by(to_user=username).first()
-            DB.session.delete(friend_request)
-            DB.session.commit()
+            delete_friend_request(username, request)
         if 'add_transaction' in request.form:
             if request.form['from_user'] == username:
                 friend_list = []
@@ -317,6 +337,13 @@ def log(username, message=None):
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
+        if "friend_request_accept" in request.form:
+            friend_status = accept_friend_request(username, request)
+            to_list = transactions.query.filter_by(from_user=username).all()
+            from_list = transactions.query.filter_by(to_user=username).all()
+            return render_template('log.html', username=username, user=user, to_list=to_list, from_list=from_list, message=message, friend_requests_list=friend_request_search(username))
+        if 'friend_request_delete' in request.form:
+            delete_friend_request(username, request)
 
     to_list = transactions.query.filter_by(from_user=username).all()
     from_list = transactions.query.filter_by(to_user=username).all()
@@ -374,6 +401,20 @@ def open_else_profile(username, query, message=None):
             transaction = transactions.query.get(id)
             DB.session.delete(transaction)
             DB.session.commit()
+        if "friend_request_accept" in request.form:
+            friend_status = accept_friend_request(username, request)
+            to_list = transactions.query.filter_by(from_user=query).all()
+            from_list = transactions.query.filter_by(to_user=query).all()
+            total_amount = 0
+            for x in to_list:
+                if x.to_user == username and x.settled=="0":
+                    total_amount += int(x.amount)
+            for x in from_list:
+                if x.from_user == username and x.settled=="0":
+                    total_amount -= int(x.amount)
+            return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount, friend_requests_list=friend_request_search(username))
+        if 'friend_request_delete' in request.form:
+            delete_friend_request(username, request)
 
     to_list = transactions.query.filter_by(from_user=query).all()
     from_list = transactions.query.filter_by(to_user=query).all()
@@ -442,6 +483,11 @@ def friends_display(username, message=None):
             DB.session.add(group)
             DB.session.commit()
             return redirect(url_for('app_blueprint.group_page', username=username, group_name=group_name))
+        if "friend_request_accept" in request.form:
+            friend_status = accept_friend_request(username, request)
+            return render_template('friends.html', username=username, user=user, friend_list=url_list, message=message, friend_requests_list=friend_request_search(username))            
+        if 'friend_request_delete' in request.form:
+            delete_friend_request(username, request)
 
     return render_template('friends.html', username=username, user=user, friend_list=url_list, message=message, friend_requests_list=friend_request_search(username))
 
@@ -465,6 +511,12 @@ def groups_display(username):
             return redirect(url_for('app_blueprint.friends_display', username=username))
         if 'groups' in request.form:
             return redirect(url_for('app_blueprint.groups_display', username=username))
+        if "friend_request_accept" in request.form:
+            friend_status = accept_friend_request(username, request)
+            return render_template('all_groups.html', username=username, user=user, group_list=group_list, friend_requests_list=friend_request_search(username))                        
+        if 'friend_request_delete' in request.form:
+            delete_friend_request(username, request)
+
 
     return render_template('all_groups.html', username=username, user=user, group_list=group_list, friend_requests_list=friend_request_search(username))
 
@@ -563,6 +615,14 @@ def group_page(username, group_name):
             transaction = group_transactions.query.get(id)
             DB.session.delete(transaction)
             DB.session.commit()
+        if "friend_request_accept" in request.form:
+            friend_status = accept_friend_request(username, request)
+            transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
+            group = groups.query.filter_by(group_name=group_name).first()
+            return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=None, friend_requests_list=friend_request_search(username))
+        if 'friend_request_delete' in request.form:
+            delete_friend_request(username, request)
+
 
     transaction_list = group_transactions.query.filter_by(group_name=group_name).all()
     group = groups.query.filter_by(group_name=group_name).first()
