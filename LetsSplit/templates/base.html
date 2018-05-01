@@ -32,11 +32,15 @@
       $(function(){
 
         $('#search_bar').bind('keyup', function(){
-            $.getJSON($SCRIPT_ROOT + '{{ username }}' + '/search_people', {
+          //console.log($SCRIPT_ROOT + '{{ username }}' + '/search_people');
+          //console.log($('input[name="search_name"]').val());
+            $.getJSON('../../' + $SCRIPT_ROOT + '{{ username }}' + '/search_people', {
+
             search : $('input[name="search_name"]').val()
           }, function(data){
             //console.log(Object.keys(data))
             //console.log(data.length)
+            console.log(data);
             var s = []
             document.getElementById('results').innerHTML = ""
             for (var x = 0; x < Object.keys(data).length; x++)
@@ -46,7 +50,7 @@
               //document.getElementsByClassName('dropdown-menu').innerHTML = document.getElementsByClassName('dropdown-menu').innerHTML + "<a class='dropdown-item'>" +  data[Object.keys(data)[x][0]] + "</a>";
             };
             //console.log(document.getElementById('results').innerHTML);
-            $('#results').style.display = 'block';
+            document.getElementById('results').style.display = 'block';
           });
           return false;
         });
@@ -108,7 +112,7 @@
             </div>
         </div>
     </nav>
-    <div id="results" style="display:hidden;" class="text-center text-white">
+    <div id="results" style="display:hidden; font-size:15vw;" class="text-center text-white">
 
     </div>
     <!--<div class="modal fade" id="AddTransactionModal">
