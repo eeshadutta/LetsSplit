@@ -28,9 +28,11 @@
 Pre-requisites
 
  1. Python 3
+ 2. 
 	 `sudo apt-get install python3`
 
  2. Flask
+ 3. 
 	 `pip3 install flask`
 
 	 `pip3 install flask_sqlalchemy`
@@ -39,6 +41,7 @@ Pre-requisites
 
 
 To Run
+
  `git clone "https://gitlab.com/manan.goel/LetsSplit"`
  
  `cd LetsSplit/LetsSplit`
