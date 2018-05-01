@@ -437,10 +437,10 @@ def group_page(username, group_name):
             return redirect(url_for('app_blueprint.groups_display', username=username))
         if 'add_transaction' in request.form:
             date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            if request.form['from_user'] not in members_list or request.form['to_user'] not in members_list:
+            if request.form['from_member'] not in members_list or request.form['to_member'] not in members_list:
                 message = "Not a group member"
                 return render_template('group_page.html', username=username, group_name=group_name, group_members=group.group_members, members_list=url_list, transaction_list=transaction_list, message=message)
-            transaction = group_transactions(group_name=group_name, from_member=request.form['from_user'], to_member=request.form['to_user'], amount=request.form['amount'], settled="0", date_created=date_created)
+            transaction = group_transactions(group_name=group_name, from_member=request.form['from_member'], to_member=request.form['to_member'], amount=request.form['amount'], settled="0", date_created=date_created)
             DB.session.add(transaction)
             DB.session.commit()
         if 'add_equal_transaction' in request.form:
