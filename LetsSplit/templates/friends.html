@@ -129,7 +129,7 @@
 </div>
 <script>
     var x = document.getElementById('friend-names').innerHTML;
-    x = x.replace(/[^a-zA-Z ]/g, "");
+    x = x.replace(/[^a-zA-Z 1-9]/g, "");
     x = x.split(' ');
     console.log(x);
     var z = 0;
@@ -144,6 +144,7 @@
     function add_to_group() {
         var flag = 0;
         console.log(friend_arr.length);
+        console.log(friend_arr);
         name = document.getElementById('friend_username').value;
         for (var i = 0; i < friend_arr.length; i++) {
             if (name == friend_arr[i]) {
