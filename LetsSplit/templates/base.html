@@ -17,7 +17,7 @@
             font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
             font-size: 250%;
         }
-
+        
         @media screen and (min-width: 768px) {
             #left {
                 position: fixed;
@@ -26,35 +26,39 @@
         }
     </style>
     <script type=text/javascript>
-      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        $SCRIPT_ROOT = {
+            {
+                request.script_root | tojson | safe
+            }
+        }
     </script>
     <script type="text/javascript">
-      $(function(){
+        $(function() {
 
-        $('#search_bar').bind('keyup', function(){
-          //console.log($SCRIPT_ROOT + '{{ username }}' + '/search_people');
-          //console.log($('input[name="search_name"]').val());
-            $.getJSON('../../' + $SCRIPT_ROOT + '{{ username }}' + '/search_people', {
+            $('#search_bar').bind('keyup', function() {
 
-            search : $('input[name="search_name"]').val()
-          }, function(data){
-            //console.log(Object.keys(data))
-            //console.log(data.length)
-            console.log(data);
-            var s = []
-            document.getElementById('results').innerHTML = ""
-            for (var x = 0; x < Object.keys(data).length; x++)
-            {
-              //console.log(Object.keys(data)[x]);
-              document.getElementById('results').innerHTML = document.getElementById("results").innerHTML + "<a class='dropdown-item btn-success text-success' style='font-size:1.5vw;' href='../../{{ username }}" + "/search/" + Object.keys(data)[x] + "/profile'>" +  Object.keys(data)[x] + "</a>";
-              //document.getElementsByClassName('dropdown-menu').innerHTML = document.getElementsByClassName('dropdown-menu').innerHTML + "<a class='dropdown-item'>" +  data[Object.keys(data)[x][0]] + "</a>";
-            };
-            //console.log(document.getElementById('results').innerHTML);
-            document.getElementById('results').style.display = 'block';
-          });
-          return false;
+                console.log($SCRIPT_ROOT + '{{ username }}' + '/search_people');
+                //console.log($('input[name="search_name"]').val());
+                $.getJSON('../../' + $SCRIPT_ROOT + '{{ username }}' + '/search_people', {
+
+                    search: $('input[name="search_name"]').val()
+                }, function(data) {
+                    //console.log(Object.keys(data))
+                    //console.log(data.length)
+                    console.log(data);
+                    var s = []
+                    document.getElementById('results').innerHTML = ""
+                    for (var x = 0; x < Object.keys(data).length; x++) {
+                        //console.log(Object.keys(data)[x]);
+                        document.getElementById('results').innerHTML = document.getElementById("results").innerHTML + "<a class='dropdown-item btn-success text-success' style='font-size:1.5vw;' href='../../{{ username }}" + "/search/" + Object.keys(data)[x] + "/profile'>" + Object.keys(data)[x] + "</a>";
+                        //document.getElementsByClassName('dropdown-menu').innerHTML = document.getElementsByClassName('dropdown-menu').innerHTML + "<a class='dropdown-item'>" +  data[Object.keys(data)[x][0]] + "</a>";
+                    };
+                    //console.log(document.getElementById('results').innerHTML);
+                    document.getElementById('results').style.display = 'block';
+                });
+                return false;
+            });
         });
-      });
     </script>
 
 </head>
@@ -89,6 +93,11 @@
                             </div>
                         </li>
                     </form>
+                    <li class="nav-item">
+                        <div class="form-group">
+                            <button class="btn btn-success btn-lg btn-block" data-toggle="modal" data-target="#FriendRequestModal">Friend Requests</button>
+                        </div>
+                    </li>
                 </ul>
                 <form action="{{ request.path }}" method="post" class="ml-auto">
                     <ul class="navbar-nav ml-auto">
@@ -114,6 +123,29 @@
     </nav>
     <div id="results" style="display:hidden; font-size:15vw;" class="text-center text-white">
 
+    </div>
+    <div class="modal fade" id="FriendRequestModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Friend Requests</h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% for friend_request in friend_requests_list %}
+                    <div class="form-group">
+                        <h3>{{ friend_request.from_user }}</h3>
+                    </div>
+                    <div class="btn-group form-group">
+                        <input type="text" value="{{user.username}}" style="display:none;" name="person">
+                        <button type="submit" class="btn btn-success btn-lg btn-block" name="friend_request_accept">Accept</button>
+                        <button type="submit" class="btn btn-success btn-lg btn-block" name="friend_request_delete">Delete</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
     </div>
     <!--<div class="modal fade" id="AddTransactionModal">
         <div class="modal-dialog">
