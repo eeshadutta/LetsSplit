@@ -65,12 +65,11 @@
                             <th class="text-center">Amount</th>
                             <th class="text-center">Settle</th>
                             <th class="text-center">Created On</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for transaction in transaction_list %} {% if transaction.settled == "0" %}
-                        <tr class="clickable btn-success text-success" data-toggle="collapse" data-target="#{{transaction.id}}">
+                        <tr>
                             <td class="text-center">{{ transaction.from_member }}</td>
                             <td class="text-center">{{ transaction.to_member }}</td>
                             <td class="text-center">{{ transaction.amount }}</td>
@@ -87,34 +86,6 @@
                                     <form action="{{ request.path }}" method="post">
                                         <input type="text" name="del_id" value="{{transaction.id}}" style="display:none;">
                                         <button class="btn btn-success btn-sm" name="delete">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="6">
-                                <div id="{{ transaction.id }}" class="collapse">
-                                    <!-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.-->
-                                    {%for comment in transaction.comments.split(',')%} {%if comment%} {%set x = comment.split(' ')%}
-                                    <!--<h5>
-                                                {{ x[0] }}
-                                            </h5>
-                                            <h6>
-                                                {{ " ".join(x[1:]) }}
-                                            </h6>
-                                            <br>-->
-                                    <span class="badge badge-pill badge-success">
-                                                <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
-                                    </span>
-                                    <br><br> {%endif%} {%endfor%}
-
-                                    <form action="{{ request.path }}" method="post">
-                                        <div class="input-group">
-                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
-                                            <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
-                                            <input type="text" name="transaction_id" style="display:none" value="{{ transaction.id }}">
-                                            <button type="submit" class="btn btn-sm btn-success bg-success" name="comment_add">Add Comment</button>
-                                        </div>
                                     </form>
                                 </div>
                             </td>
@@ -138,40 +109,12 @@
                     </thead>
                     <tbody>
                         {% for transaction in transaction_list %} {% if transaction.settled == "1" %}
-                        <tr class="clickable btn-success text-success" data-toggle="collapse" data-target="#{{ transaction.id }}">
+                        <tr>
                             <td class="text-center">{{ transaction.from_member }}</td>
                             <td class="text-center">{{ transaction.to_member }}</td>
                             <td class="text-center">{{ transaction.amount }}</td>
                             <td class="text-center">{{ transaction.date_created }}</td>
                             <td class="text-center">{{ transaction.date_settled }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div id="{{ transaction.id }}" class="collapse">
-                                    <!-- Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere repudiandae, ipsa ex vero deleniti nostrum alias laborum aut hic adipisci sunt repellat cumque corrupti? Culpa vero animi accusantium recusandae perferendis.-->
-                                    {%for comment in transaction.comments.split(',')%} {%if comment%} {%set x = comment.split(' ')%}
-                                    <!--<h5>
-                                                    {{ x[0] }}
-                                                </h5>
-                                                <h6>
-                                                    {{ " ".join(x[1:]) }}
-                                                </h6>
-                                                <br>-->
-                                    <span class="badge badge-pill badge-success">
-                                                    <h6><span class="font-weight-bold">{{ x[0] }}</span> {{ " ".join(x[1:]) }}</h6>
-                                    </span>
-                                    <br> <br>{%endif%} {%endfor%}
-
-                                    <form action="{{ request.path }}" method="post">
-                                        <div class="input-group">
-                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Add Comment">
-                                            <input type="text" name="submitting_user" style="display:none" value="{{ username }}">
-                                            <input type="text" name="transaction_id" style="display:none" value="{{ transaction.id }}">
-                                            <button type="submit" class="btn btn-sm btn-success bg-success" name="comment_add">Add Comment</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </td>
                         </tr>
                         {% endif %} {% endfor %}
                     </tbody>
@@ -188,8 +131,8 @@
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-footer btn-group">
-                        <button class="btn btn-success btn-block" data-target="#UnequalSplit" data-toggle="collapse">Individual Transaction</button>
-                        <button class="btn btn-success" data-target="#EqualSplit" data-toggle="collapse">Equal Split</button>
+                      <button class="btn btn-success btn-block" data-target="#UnequalSplit" data-toggle="collapse">Individual Transaction</button>
+                      <button class="btn btn-success" data-target="#EqualSplit" data-toggle="collapse">Equal Split</button>
                     </div>
 
                     <div class="collapse" id="UnequalSplit">
@@ -228,15 +171,15 @@
                                     <input type="username" name="total_amount" class="form-control" placeholder="Total Amount" required>
                                 </div>
                                 <div class="form-group form-inline">
-                                    <input type="amount" id="peeps_receiving_add" class="form-control" placeholder="People Receiving" required>
-                                    <button class="btn btn-success" onclick="Add_Person_to_People_Receiving();" type="button">Add Person</button>
+                                    <input type="amount" id="peeps_members" name="peeps" class="form-control" placeholder="Members" required>
+                                    <button class="btn btn-success" onclick="Add_Person_to_Members();" type="button">Add Person</button>
 
                                 </div>
                                 <div class="form-group">
-                                    <h3 id="peeps_receiving">
+                                    <h3 id="peeps_members_paying">
 
                                     </h3>
-                                    <input type="text" name="members_receiving" id="members_receiving" style="display:none;">
+                                    <input type="text" name="all_members" id="all_members" style="display:none;">
                                 </div>
                                 <!--<div class="form-group">
                                     <input type="amount" name="num_paying" class="form-control" placeholder="Number of people paying" required>
@@ -249,7 +192,7 @@
                                     <h3 id="peeps_paying">
 
                                     </h3>
-                                    <input type="text" name="members_paying" id="members_paying" style="display:none;">
+                                    <input type="text" id="members_paying" name="members_paying" style="display:none;">
                                 </div>
                                 <div class="alert alert-danger text-danger" id="wrong_person" style="display:none;">
 
@@ -300,31 +243,31 @@
                                 };
                             };
 
-                            function Add_Person_to_People_Receiving() {
-                                var x = document.getElementById('peeps_receiving_add').value;
-                                var flag = 0;
-                                m = document.getElementsByClassName('group_all_members');
-                                //console.log(document.getElementsByClassName('group_all_members'));
-                                for (var y = 0; y < m.length; y++) {
-                                    var x = document.getElementById('peeps_receiving_add').value;
-                                    console.log(m[y].innerHTML);
-                                    console.log(x);
-                                    if (m[y].innerHTML == x) {
-                                        flag = 1;
-                                        //console.log(flag);
-                                        break;
-                                    };
-                                    //console.log(flag);
-                                };
-                                if (flag == 0) {
-                                    document.getElementById('wrong_person').innerHTML = "This Person is Not a Member of the group";
-                                    document.getElementById('wrong_person').style.display = 'block';
-                                } else {
-                                    var x = document.getElementById('peeps_receiving_add').value;
-                                    document.getElementById('wrong_person').style.display = 'none';
-                                    document.getElementById('peeps_receiving').innerHTML = document.getElementById('peeps_receiving').innerHTML + x + ',';
-                                    document.getElementById('members_receiving').value = document.getElementById('peeps_receiving').innerHTML;
-                                };
+                            function Add_Person_to_Members() {
+                              var x = document.getElementById('peeps_members').value;
+                              var flag = 0;
+                              m = document.getElementsByClassName('group_all_members');
+                              //console.log(document.getElementsByClassName('group_all_members'));
+                              for (var y = 0; y < m.length; y++) {
+                                  var x = document.getElementById('peeps_members').value;
+                                  console.log(m[y].innerHTML);
+                                  console.log(x);
+                                  if (m[y].innerHTML == x) {
+                                      flag = 1;
+                                      //console.log(flag);
+                                      break;
+                                  };
+                                  //console.log(flag);
+                              };
+                              if (flag == 0) {
+                                document.getElementById('wrong_person').innerHTML = "This Person is Not a Member of the group";
+                                document.getElementById('wrong_person').style.display = 'block';
+                              } else {
+                                var x = document.getElementById('peeps_members').value;
+                                document.getElementById('wrong_person').style.display = 'none';
+                                document.getElementById('peeps_members_paying').innerHTML = document.getElementById('peeps_members_paying').innerHTML + x + ',';
+                                document.getElementById('all_members').value = document.getElementById('peeps_members_paying').innerHTML;
+                              };
                             };
                         </script>
                     </div>
