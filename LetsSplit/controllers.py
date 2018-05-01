@@ -7,23 +7,27 @@ from models import DB, users, friends, transactions, groups, group_transactions
 
 app_blueprint = Blueprint('app_blueprint', __name__)
 
-def search(request):
+def search(username, request):
     search_user = request.args.get('search', None, str)
-    #print(search_user)
+    user = friends.query.filter_by(username=username).first()
+    print(user.friend)
     if search_user:
         if len(search_user) > 0:
             results = users.query.filter(users.username.startswith(search_user)).all()
             ans_list = {}
+            user_friend_list = user.friend.split(',')
+
             if results is not None:
                 for x in results:
-                    ans_list[x.username] = []
-                    ans_list[x.username].append(x.name)
-                    ans_list[x.username].append(x.profile_pic)
+                    if x.username in user_friend_list:
+                        ans_list[x.username] = []
+                        ans_list[x.username].append(x.name)
+                        ans_list[x.username].append(x.profile_pic)
             return ans_list
 
-@app_blueprint.route('/search_people')
-def searching():
-    results = search(request)
+@app_blueprint.route('/<username>/search_people')
+def searching(username):
+    results = search(username, request)
     return jsonify(results)
 
 
@@ -308,7 +312,7 @@ def open_else_profile(username, query, message=None):
                     DB.session.commit()
             else:
                 message = "Please enter the correct usernames"
-                return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)                
+                return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount)
         if 'delete' in request.form:
             id = request.form['del_id']
             transaction = transactions.query.get(id)
@@ -452,7 +456,7 @@ def group_page(username, group_name):
             num_paying = len(members_paying) - 1
             each_recieves = (total_amount/num_receiving) - (total_amount/total_people)
             each_pays = each_recieves/num_paying
-            date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')            
+            date_created = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             for receiver in members_receiving:
                 for payee in members_paying:
                     if receiver != '' and payee != '':
