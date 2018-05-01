@@ -12,12 +12,15 @@
 ![enter image description here](https://lh3.googleusercontent.com/hzH3QOdvwuvHvPqqjwODlLSxiEghL0qLHsa5hFU6yo0HqEmq5ooyMkifi21mcQYhaa_PzGhxz0DX "Profile")
 
 *Find Your Friends*
+
 ![](https://lh3.googleusercontent.com/nADG9NebTWQjUN8of_UVsUGnbeRhDBWjDH4tZ4aRj1V4RXbl70wMutvJfxdVq0pabBCwzagPzP25 "FindFriends")
 
 *Make Individual Transactions in the Group or pay as whole*
+
 ![](https://lh3.googleusercontent.com/ZYtRwlp4UL5_8E9ZMHDUupJEIwYV7mtpYoraECet3YrJhyVfjQDko91Y5SwCLWm72MbImlqI0hAT "GroupTransactions")
 
 *Add Comments*
+
 ![](https://lh3.googleusercontent.com/A0K2z7mVJ--4V3uddC-EZwetnOkFiZbrZVg6G_8qd2eMG0GNF02xyR51TdRyleDrZY9Bt8utjCIe "Comments")
 
 **To Run The App**
