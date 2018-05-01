@@ -415,6 +415,17 @@ def open_else_profile(username, query, message=None):
             return render_template('else_profile.html', username=username, query=query, query_user=query_user, from_list=from_list, to_list=to_list, message=message, total_amount=total_amount, friend_requests_list=friend_request_search(username))
         if 'friend_request_delete' in request.form:
             delete_friend_request(username, request)
+        if 'settle_all' in request.form:
+            all_trans = transactions.query.filter_by(from_user=username).filter_by(to_user=query).all()
+            date_settled = datetime.now().strftime('%Y-%m-%d %H:%M:%S')            
+            for trans in all_trans:
+                trans.settled = "1"
+                trans.date_settled = date_settled
+            all_trans = transactions.query.filter_by(from_user=query).filter_by(to_user=username).all()
+            for trans in all_trans:
+                trans.settled = "1"
+                trans.date_settled = date_settled
+            DB.session.commit()
 
     to_list = transactions.query.filter_by(from_user=query).all()
     from_list = transactions.query.filter_by(to_user=query).all()

@@ -20,9 +20,12 @@
         <div class="col offset-md-6">
             <div>
                 {% if total_amount == 0 %}
-                <h3 class="text-center text-success">Yaaay!! You're all settled</h3><br><br> {% elif total_amount
-                < 0 %} <h3 class="text-center text-success">You owe {{query_user.name}} {{ -1 * total_amount }}</h3><br><br> {% else %}
-                    <h3 class="text-center text-success">{{ query_user.name }} owes {{ total_amount }}</h3><br><br> {% endif %}
+                <h3 class="text-center text-success">Yaaay!! You're all settled</h3><br><br> {% elif total_amount < 0 %} 
+                <h3 class="text-center text-success">You owe {{query_user.name}} {{ -1 * total_amount }}</h3><br><br> {% else %}
+                <h3 class="text-center text-success">{{ query_user.name }} owes {{ total_amount }}</h3><br>
+                <form action="{{ request.path }}" method="post">
+                    <button type="submit" name="settle_all" class="btn btn-success btn-lg btn-block bg-success">Settle All</button>
+                </form><br><br> {% endif %}
             </div>
             <h3 class="text-center text-success">Your Transactions with {{ query_user.name }}</h3><br>
             <h4 class="text-center text-success">Unsettled Transactions</h4>
@@ -33,6 +36,7 @@
                             <th class="text-center">Amount</th>
                             <th class="text-center">Settle</th>
                             <th class="text-center">Created On</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>

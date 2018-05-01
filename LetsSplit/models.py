@@ -34,7 +34,7 @@ class users(DB.Model):
 
 class friends(DB.Model):
     id = DB.Column('user_id', DB.Integer, primary_key = True)
-    username = DB.Column(DB.String(50))
+    username = DB.Column(DB.String(50), DB.ForeignKey("users.username"), nullable=False)
     friend = DB.Column(DB.String(8000))
     
     def __init__(self, username, friends=''):
@@ -96,7 +96,7 @@ class group_transactions(DB.Model):
 
 class friend_requests(DB.Model):
     id = DB.Column('user_id', DB.Integer, primary_key=True)
-    from_user = DB.Column(DB.String(50))
+    from_user = DB.Column(DB.String(50), DB.ForeignKey("users.username"), nullable=False)
     to_user = DB.Column(DB.String(50))
 
     def __init__(self, from_user, to_user):
