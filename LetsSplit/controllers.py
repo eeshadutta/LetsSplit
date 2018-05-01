@@ -63,7 +63,7 @@ def sign_up(message=None):
                     message = 'Please Enter Password'
                 elif x.check_password(str(request.form['password'])) == True and x is not None:
                     return redirect(url_for('app_blueprint.profile_page', username=request.form['username']))
-                elif str(x.password) != str(request.form['password']):
+                elif x.check_password(str(request.form['password'])) == False:
                     message = "Incorrect Password"
 
     return render_template('home.html', message=message)
