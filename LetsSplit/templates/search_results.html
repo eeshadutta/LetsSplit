@@ -5,27 +5,64 @@
         {% endif %}
         <div class="card col-md-5 bg-success text-white" style="margin-top:1vw;">
             <img class="card-img-top img-thumbnail" src="../../static/{{ user.profile_pic }}" alt="Card Image" style="position:relative; top:2%;">
+            <!--<div class="card-body">
+                {% if friend_status[user.username] == "Friend" %}
+                <a class="text-decoration: none;" href="{{ user.username }}/profile">
+                    <h4 class="card-title card-header" style="color:white">Name: {{ user.name }}</h4>
+                </a>
+                {% endif %}
+                <div class="card-text card-body  ">Username: {{ user.username }}</div>
+                <div class="card-text card-footer">Email: {{ user.email }}</div>
+                {% if friend_status[user.username] == "Friend Request sent to me" %}
+                <form action="{{ request.path }}" method="post">
+                    <input type="text" name="friend_to_be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
+                    <button type="submit" name="add_friend" class="btn btn-success btn-lg btn-block">Add Friend</button>
+                </form>
+                {% endif %}
+                {% if friend_status[user.username] == "Friend Request sent by me" %}
+                <form action="{{ request.path }}" method="post">
+                    <input type="text" name="friend_to_be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
+                    <button type="submit" name="add_friend" class="btn btn-success btn-lg btn-block">Add Friend</button>
+                </form>
+                {% endif %}
+            </div>-->
             <div class="card-body">
-                {% if user.username in friend_list %}
+                {% if friend_status[user.username] == "Friend" %}
                 <a class="text-decoration: none;" href="{{ user.username }}/profile">
                     <h4 class="card-title card-header" style="color:white">Name: {{ user.name }}</h4>
                 </a>
                 {% else %}
                 <h4 class="card-title card-header" style="color:white">Name: {{ user.name }}</h4>
                 {% endif %}
-                <div class="card-text card-body  ">Username: {{ user.username }}</div>
+
+                <div class="card-text card-body">Username: {{ user.username }}</div>
                 <div class="card-text card-footer">Email: {{ user.email }}</div>
-                {% if user.username not in friend_list %}
-                <form action="{{ request.path }}" method="post">
-                    <input type="text" name="friend_to_be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
-                    <button type="submit" name="add_friend" class="btn btn-success btn-lg btn-block">Add Friend</button>
-                </form>
-                {% else %}
-                <div class="card-text card-footer text-center">
-                    Friends
-                    <span class="bg-success"><i class="fa fa-check"></i></span>
+                <div class="card-footer">
+                    {% if friend_status[user.username] == "Friend" %}
+                    <div class="card-text card-footer text-center">
+                        Friends <span class="bg-success"><i class="fa fa-check"></i></span>
+                    </div>
+                    {% elif friend_status[user.username] == "Friend Request sent to me" %}
+
+                    <form action="{{request.path}}" method="post">
+                        <div class="btn-group card-footer">
+                            <input type="text" value="{{user.username}}" style="display:none;" name="person">
+                            <button type="submit" class="btn btn-success" name="friend_request_accept">Accept</button>
+                            <button type="submit" class="btn btn-success btn-block" name="friend_request_delete">Delete</button>
+                        </div>
+                    </form>
+
+                    {% elif friend_status[user.username] == "Friend Request sent by me" %}
+                    <div class="card-text card-footer text-center">
+                        Friend Request Sent
+                    </div>
+                    {% else %}
+                    <form action="{{ request.path }}" method="post">
+                        <input type="text" name="friend_to_be_added" value="{{ user.username }}" class="form-control form-control-lg" style="display:none">
+                        <button type="submit" name="add_friend" class="btn btn-success btn-lg btn-block">Add Friend</button>
+                    </form>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
         {% if count[0]%2==0 %}

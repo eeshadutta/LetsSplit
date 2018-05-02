@@ -37,7 +37,7 @@ Pre-requisites
 
 	 `pip3 install flask_sqlalchemy`
 
- 3. A Little Money
+ 3. A Little Money and a Big Heart
 
 
 To Run
